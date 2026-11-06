@@ -7,7 +7,7 @@ import {
 } from '../../../../../../shared/structured-native-chat-launch-route'
 import type { TuiAgent } from '../../../../../../shared/agent-launch/catalog/tui-agent'
 import type { WorkspaceLaunchKind } from '../../../../../../shared/workspace-launch-kind'
-import type { NativeChatLaunchPromptDelivery } from '@/lib/native-chat-launch-prompt-delivery'
+import type { NativeChatLaunchPromptDelivery } from '@/lib/agent-session/launch/prompt/native-chat-launch-prompt-delivery'
 
 export type AgentLaunchRoute = 'structured-native-chat' | 'terminal-tui'
 

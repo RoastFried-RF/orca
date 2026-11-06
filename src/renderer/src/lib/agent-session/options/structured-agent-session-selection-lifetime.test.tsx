@@ -1,29 +1,29 @@
 import { resetHostModelCatalogSnapshotsForTests } from '@/runtime/host-model-catalog-snapshots'
 import type { StructuredAgentSessionMutate } from '@/components/native-chat/use-structured-agent-session-mutate'
-import type { AgentSessionOptionsResult } from '../../../shared/agent-session/options/agent-session-options-result'
+import type { AgentSessionOptionsResult } from '../../../../../shared/agent-session/options/agent-session-options-result'
 // @vitest-environment happy-dom
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
-import type { StructuredAgentSessionLaunchIntent } from './launch-structured-agent-session'
-import type { RuntimeStatus } from '../../../shared/runtime-types'
-import { useAppStore } from '@/store'
+import type { StructuredAgentSessionLaunchIntent } from '../../launch-structured-agent-session'
+import type { RuntimeStatus } from '../../../../../shared/runtime-session-contracts'
+import { useAppStore } from '@/store/index'
 import { useStructuredAgentSessionOptionState } from '@/components/native-chat/use-structured-agent-session-option-state'
-import { structuredAgentSessionSeedCatalog } from '../../../shared/agent-session/options/structured-agent-session-seed-catalog'
-import { structuredAgentSessionMessageSelection } from '../../../shared/agent-session/options/structured-agent-session-option-view'
-import { structuredAgentSessionModelId } from '../../../shared/agent-session/options/structured-agent-session-option-state'
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
+import { structuredAgentSessionSeedCatalog } from '../../../../../shared/agent-session/options/structured-agent-session-seed-catalog'
+import { structuredAgentSessionMessageSelection } from '../../../../../shared/agent-session/options/structured-agent-session-option-view'
+import { structuredAgentSessionModelId } from '../../../../../shared/agent-session/options/structured-agent-session-option-state'
+import { startStructuredAgentLaunch } from '../launch/structured-agent-session-launch'
 import {
   holdStructuredAgentSessionLaunchOption,
   structuredLaunchSelectionController
-} from './agent-session/launch/structured-agent-session-launch-options'
+} from '../launch/structured-agent-session-launch-options'
 import {
   getStructuredLaunchStateBySessionId,
   resetStructuredAgentLaunchRegistryForTests
-} from './agent-session/launch/structured-agent-session-launch-registry'
+} from '../launch/structured-agent-session-launch-registry'
 import { useStructuredAgentSessionOptions } from '@/components/native-chat/use-structured-agent-session-options'
 import { listRuntimeSessionHostsForStartup } from '@/app-shell/startup-runtime-session-hosts'
 import { structuredAgentSessionTargetForTab } from '@/runtime/structured-agent-session-owner'
-import type { PublicKnownRuntimeEnvironment } from '../../../shared/remote-runtime/host-catalog/runtime-environments'
+import type { PublicKnownRuntimeEnvironment } from '../../../../../shared/remote-runtime/host-catalog/runtime-environments'
 import {
   registerStructuredSelectionCatalogStore,
   forgetStructuredSessionSelection,
@@ -38,11 +38,11 @@ const transport = vi.hoisted(() => ({
   call: vi.fn(),
   remember: vi.fn()
 }))
-vi.mock('./launch-structured-agent-session', () => ({
+vi.mock('../../launch-structured-agent-session', () => ({
   createStructuredAgentSessionLaunchIntent: transport.intent,
   abandonStructuredAgentSessionLaunchIntent: vi.fn()
 }))
-vi.mock('./agent-session/launch/structured-agent-session-launch-create-call', () => ({
+vi.mock('../launch/structured-agent-session-launch-create-call', () => ({
   launchStructuredAgentSession: transport.create
 }))
 vi.mock('@/runtime/structured-agent-session-client', () => ({

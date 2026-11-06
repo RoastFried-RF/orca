@@ -31,7 +31,7 @@ import { ORCA_LAYOUT_OWNER_IS_MAIN } from '../../../../../shared/layout-owner-sw
 import {
   openAgentSessionTabThroughLayoutOwner,
   type OpenedAgentSessionTab
-} from '../../structured-agent-session-tab-open-through-layout-owner'
+} from './pane/structured-agent-session-tab-open-through-layout-owner'
 import {
   clearWebSessionFocusIntentIfMatches,
   peekWebSessionFocusIntent,

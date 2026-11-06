@@ -25,7 +25,7 @@ vi.mock('@/runtime/local-runtime-capabilities', () => ({
   readLocalRuntimeCapabilitiesOrUnknown: mocks.readLocalRuntimeCapabilitiesOrUnknown
 }))
 vi.mock('@/runtime/runtime-rpc-client', () => ({ callRuntimeRpc: mocks.callRuntimeRpc }))
-vi.mock('@/lib/structured-agent-launch-settlement', () => ({}))
+vi.mock('@/lib/agent-session/launch/continuation/structured-agent-launch-settlement', () => ({}))
 
 import {
   loadHostStructuredAgents,

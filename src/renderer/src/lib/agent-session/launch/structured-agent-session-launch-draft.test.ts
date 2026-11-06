@@ -6,25 +6,28 @@ import {
   composerDraft
 } from './structured-agent-session-launch.test-fixture'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { moveStructuredAgentLaunchDraft } from './agent-session/launch/structured-agent-session-launch-draft'
+import { moveStructuredAgentLaunchDraft } from './structured-agent-session-launch-draft'
 import { nativeChatDraftPositions } from '@/components/native-chat/native-chat-composer-draft-memory'
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { hasStagedStructuredLaunchPrompt } from './agent-session/launch/structured-agent-session-launch-prompt'
+import { startStructuredAgentLaunch } from './structured-agent-session-launch'
+import './structured-agent-session-launch-prompt'
+import { hasStagedStructuredLaunchPrompt } from './structured-agent-session-staged-prompt'
 import {
   clearNativeChatComposerDraftsForTests,
-  hydrateNativeChatComposerDrafts,
-  flushNativeChatComposerDrafts,
   isNativeChatComposerDraftUnsaved,
-  nativeChatComposerDraftWritesSettled,
   readNativeChatComposerDraft,
   structuredAgentSessionDraftScopeKey,
   updateNativeChatComposerDraft
 } from '@/components/native-chat/native-chat-composer-draft-store'
+import { hydrateNativeChatComposerDrafts } from '@/components/native-chat/native-chat-composer-draft-load'
+import {
+  flushNativeChatComposerDrafts,
+  nativeChatComposerDraftWritesSettled
+} from '@/components/native-chat/native-chat-composer-draft-persistence'
 import {
   createMemoryNativeChatComposerDraftStorage,
   setNativeChatComposerDraftStorageForTests
 } from '@/components/native-chat/native-chat-composer-draft-storage'
-import { resetStructuredAgentLaunchRegistryForTests } from './agent-session/launch/structured-agent-session-launch-registry'
+import { resetStructuredAgentLaunchRegistryForTests } from './structured-agent-session-launch-registry'
 import { act, renderHook } from '@testing-library/react'
 import { useNativeChatDraft } from '@/components/native-chat/use-native-chat-draft'
 import { useNativeChatStructuredComposerSend } from '@/components/native-chat/use-native-chat-structured-composer-send'

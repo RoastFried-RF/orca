@@ -1,4 +1,4 @@
-import type { AppState } from '../store/types'
+import type { AppState } from '../../../store/types'
 import type { NativeChatComposerDraftOwner } from '@/components/native-chat/native-chat-composer-draft-storage'
 import {
   nativeChatDraftScopeTabId,
@@ -7,8 +7,8 @@ import {
 import {
   chatWorkspaceByTabId,
   structuredChatWorkspacesBySessionId
-} from './structured-chat-tab-index'
-import { resolveWorktreeOperationRoute } from './worktree-operation-route'
+} from '../../../lib/structured-chat-tab-index'
+import { resolveWorktreeOperationRoute } from '../../../lib/worktree-operation-route'
 
 function workspaceOfDraftScope(
   state: Pick<AppState, 'tabsByWorktree' | 'unifiedTabsByWorktree'>,

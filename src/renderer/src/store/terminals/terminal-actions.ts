@@ -20,7 +20,10 @@ import type {
   GeneratedTabTitleUpdate,
   TerminalTabTitleUpdate
 } from '../slices/terminal-tab-title-batch'
-import type { NativeChatLaunchDraft, NativeChatLaunchPrompt } from '@/lib/native-chat-launch-prompt'
+import type {
+  NativeChatLaunchDraft,
+  NativeChatLaunchPrompt
+} from '@/components/native-chat/drafts/native-chat-launch-prompt'
 import type { AgentStatusWorktreeShutdownReason } from '../slices/agent-status/agent-status-contract'
 import type {
   TerminalTabCloseReason,

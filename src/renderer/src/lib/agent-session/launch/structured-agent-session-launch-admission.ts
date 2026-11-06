@@ -21,7 +21,7 @@ import { StructuredAgentSessionCreateRefusalError } from '@/lib/agent-session/la
 import type {
   StructuredAgentLaunchHooks,
   StructuredAgentLaunchSettlement
-} from '@/lib/structured-agent-launch-settlement'
+} from '@/lib/agent-session/launch/continuation/structured-agent-launch-settlement'
 import type { StructuredPromptDeliveryResult } from '@/lib/agent-session/launch/structured-agent-session-launch-prompt'
 import type { LaunchAgentInNewTabArgs } from '@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab-args'
 import type { RuntimeClientTarget } from '../../../../../shared/runtime-client-target'

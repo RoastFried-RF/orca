@@ -1,10 +1,10 @@
-import { structuredAgentSessionStopControl } from '../../../shared/agent-session/view/structured-agent-session-stop-control'
-import { isStructuredAgentSessionMainAgentWorking } from '../../../shared/agent-session/view/structured-agent-session-main-agent-working'
+import { structuredAgentSessionStopControl } from '../../../../../shared/agent-session/view/structured-agent-session-stop-control'
+import { isStructuredAgentSessionMainAgentWorking } from '../../../../../shared/agent-session/view/structured-agent-session-main-agent-working'
 import { expect, it, vi } from 'vitest'
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { holdStructuredAgentSessionLaunchOption } from './agent-session/launch/structured-agent-session-launch-options'
+import { startStructuredAgentLaunch } from './structured-agent-session-launch'
+import { holdStructuredAgentSessionLaunchOption } from './structured-agent-session-launch-options'
 import { recordHostModelCatalogSnapshot } from '@/runtime/host-model-catalog-snapshots'
-import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import {
   mocks,
   deferred,
@@ -14,12 +14,12 @@ import {
   created,
   draft
 } from './structured-agent-session-launch-create-message.test-fixture'
-import { structuredAgentSessionCreateFingerprint } from '../../../shared/agent-session/lifecycle/structured-agent-session-mutation'
+import { structuredAgentSessionCreateFingerprint } from '../../../../../shared/agent-session/lifecycle/structured-agent-session-mutation'
 import { getStructuredAgentSessionReadOwner } from '@/components/native-chat/structured-agent-session-read-owner'
 import { getStructuredAgentSessionPendingSends } from '@/components/native-chat/structured-agent-session-pending-sends'
-import { readStructuredAgentLaunchRecord } from './agent-session/launch/structured-agent-session-launch-persistence'
-import { getStructuredLaunchStateBySessionId } from './agent-session/launch/structured-agent-session-launch-registry'
-import { structuredSessionSelectionController } from './structured-agent-session-selection-controller'
+import { readStructuredAgentLaunchRecord } from './structured-agent-session-launch-persistence'
+import { getStructuredLaunchStateBySessionId } from './structured-agent-session-launch-registry'
+import { structuredSessionSelectionController } from '../options/structured-agent-session-selection-controller'
 import { setRuntimeEnvironmentConnectionGenerationForTests } from '@/store/slices/runtime-status-connection-generation'
 import { replaceRuntimeEnvironmentRevisions } from '@/runtime/runtime-environment-revision'
 

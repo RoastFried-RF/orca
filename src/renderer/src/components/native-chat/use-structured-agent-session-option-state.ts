@@ -1,7 +1,7 @@
 import {
   structuredSessionSelectionAuthority,
   structuredSessionSelectionController
-} from '@/lib/structured-agent-session-selection-controller'
+} from '@/lib/agent-session/options/structured-agent-session-selection-controller'
 import { useStructuredSessionSelectionReads } from './use-structured-session-selection-reads'
 import { projectRuntimePermission } from '../../../../shared/agent-session/options/structured-agent-session-permission-option'
 import { useStructuredAgentSessionStatusSummary } from './StructuredAgentSessionStatusBridge'

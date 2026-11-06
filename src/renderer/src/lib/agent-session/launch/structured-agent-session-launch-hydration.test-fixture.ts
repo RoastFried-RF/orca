@@ -1,13 +1,13 @@
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { STRUCTURED_AGENT_SESSION_SUBMISSION_MISSING } from '../../../shared/agent-session/requests/structured-agent-session-send-evidence'
+import { startStructuredAgentLaunch } from './structured-agent-session-launch'
+import { STRUCTURED_AGENT_SESSION_SUBMISSION_MISSING } from '../../../../../shared/agent-session/requests/structured-agent-session-send-evidence'
 import { getStructuredAgentSessionReadOwner } from '@/components/native-chat/structured-agent-session-read-owner'
 import { projectStructuredAgentSessionMessages } from '@/components/native-chat/structured-agent-session-message-projection'
 import { createNativeChatMessageListProjection } from '@/components/native-chat/native-chat-message-list-projection'
-import { agentJournalSubmissionKey } from '../../../shared/agent-session/journal/agent-session-journal-item-key'
+import { agentJournalSubmissionKey } from '../../../../../shared/agent-session/journal/agent-session-journal-item-key'
 import { expect, it } from 'vitest'
-import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import { getStructuredAgentSessionPendingSends } from '@/components/native-chat/structured-agent-session-pending-sends'
-import { readStructuredAgentLaunchRecord } from './agent-session/launch/structured-agent-session-launch-persistence'
+import { readStructuredAgentLaunchRecord } from './structured-agent-session-launch-persistence'
 import {
   mocks,
   created,

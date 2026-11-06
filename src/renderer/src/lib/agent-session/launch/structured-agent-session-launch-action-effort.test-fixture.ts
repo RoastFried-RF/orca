@@ -1,14 +1,14 @@
 import { expect, it, vi, type Mock } from 'vitest'
-import { CreateIntentParams } from '../../../shared/rpc-contract/structured-agent-session-params'
+import { CreateIntentParams } from '../../../../../shared/rpc-contract/structured-agent-session-params'
 import {
   projectSourceControlActionLaunch,
   resolveSourceControlActionSessionOptions
-} from '../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { holdStructuredAgentSessionLaunchOption } from './agent-session/launch/structured-agent-session-launch-options'
+} from '../../../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
+import { startStructuredAgentLaunch } from './structured-agent-session-launch'
+import { holdStructuredAgentSessionLaunchOption } from './structured-agent-session-launch-options'
 import { recordHostModelCatalogSnapshot } from '@/runtime/host-model-catalog-snapshots'
-import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
-export { registerCreateSelectionTests } from './structured-agent-session-create-selection.test-fixture'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
+import './structured-agent-session-create-selection.test-fixture'
 
 export function registerActionEffortCreateTests(
   mocks: {
@@ -30,19 +30,18 @@ export function registerActionEffortCreateTests(
   ] as const)(
     'carries captured raw source through actual admitted $host planning, create and recovery (ordinary=$ordinary)',
     async ({ host, ordinary }) => {
-      const { planAgentSessionLaunch } =
-        await import('./agent-session/launch/routing/agent-session-launch-plan')
-      const { useAppStore } = await import('@/store')
+      const { planAgentSessionLaunch } = await import('./routing/agent-session-launch-plan')
+      const { useAppStore } = await import('@/store/index')
       const { setLocalRuntimeCapabilitiesForTests } =
         await import('@/runtime/local-runtime-capabilities')
       const {
         STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
         STRUCTURED_AGENT_SESSION_CLIENT_LAUNCH_MODE_CAPABILITY
-      } = await import('../../../shared/agent-session/agent-session-runtime-capabilities')
+      } = await import('../../../../../shared/agent-session/agent-session-runtime-capabilities')
       const { readStructuredAgentLaunchRecord } =
-        await import('./agent-session/launch/structured-agent-session-launch-persistence')
+        await import('./structured-agent-session-launch-persistence')
       const { getStructuredLaunchStateBySessionId } =
-        await import('./agent-session/launch/structured-agent-session-launch-registry')
+        await import('./structured-agent-session-launch-registry')
       const capabilities = [
         STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
         STRUCTURED_AGENT_SESSION_CLIENT_LAUNCH_MODE_CAPABILITY

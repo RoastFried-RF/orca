@@ -1,24 +1,24 @@
 import { expect, it, vi } from 'vitest'
-import { sendMessageToAgent } from './agent-message-send'
-import { SendParams } from '../../../shared/rpc-contract/structured-agent-session-params'
-import type { Tab } from '../../../shared/tab-types'
-import { beginStructuredAgentLaunchSettlement } from './structured-agent-launch-settlement'
+import { sendMessageToAgent } from '../../agent-message-send'
+import { SendParams } from '../../../../../shared/rpc-contract/structured-agent-session-params'
+import type { Tab } from '../../../../../shared/tab-types'
+import { beginStructuredAgentLaunchSettlement } from './continuation/structured-agent-launch-settlement'
 import {
   getStructuredAgentLaunchStatus,
   hasStructuredAgentLaunchInWorktree
-} from './agent-session/launch/structured-agent-session-launch-status'
-import { admitStructuredAgentSession } from './agent-session/structured-agent-session-busy'
+} from './structured-agent-session-launch-status'
+import { admitStructuredAgentSession } from '../structured-agent-session-busy'
 import { renderHook } from '@testing-library/react'
 import { useNativeChatProvisionalLaunch } from '@/components/native-chat/use-native-chat-provisional-launch'
-import { getStructuredLaunchStateBySessionId } from './agent-session/launch/structured-agent-session-launch-registry'
-import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
+import { getStructuredLaunchStateBySessionId } from './structured-agent-session-launch-registry'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import {
   getStructuredAgentSessionPendingSends,
   getStructuredAgentSessionSendNotice
 } from '@/components/native-chat/structured-agent-session-pending-sends'
-import { readStructuredAgentLaunchRecord } from './agent-session/launch/structured-agent-session-launch-persistence'
+import { readStructuredAgentLaunchRecord } from './structured-agent-session-launch-persistence'
 import { settleStructuredAgentSessionSendsFromJournal } from '@/components/native-chat/structured-agent-session-message-sender'
-import { holdStructuredAgentSessionLaunchOption } from './agent-session/launch/structured-agent-session-launch-options'
+import { holdStructuredAgentSessionLaunchOption } from './structured-agent-session-launch-options'
 import { writeNativeChatDraftCache } from '@/components/native-chat/native-chat-draft-cache'
 import { structuredAgentSessionDraftScopeKey } from '@/components/native-chat/native-chat-composer-draft-store'
 import {

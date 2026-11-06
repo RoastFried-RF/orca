@@ -6,7 +6,7 @@ import { drawTabsFromMain } from '@/store/slices/tabs-drawn-from-main.test-fixtu
 import type * as Frames from '@/store/slices/tabs-drawn-from-main.test-fixture'
 import { createGlobalSettingsFixture } from '../../../../../../shared/global-settings-test-fixture'
 import type { GlobalSettings } from '../../../../../../shared/global-settings-types'
-import { registerStructuredSelectionCatalogStore } from '../../../structured-agent-session-selection-controller'
+import { registerStructuredSelectionCatalogStore } from '../../options/structured-agent-session-selection-controller'
 import type { AppState } from '@/store/types'
 import type { pasteDraftWhenAgentReady } from '../../../agent-paste-draft'
 import type { waitForAgentReady } from '../../../agent-ready-wait'

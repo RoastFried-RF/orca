@@ -55,7 +55,7 @@ vi.mock('../../../../shared/native-chat/native-chat-agent-profiles', async (impo
   ...(await importOriginal<typeof nativeChatAgentProfiles>()),
   getVerifiedNativeChatCommands: () => []
 }))
-vi.mock('@/lib/native-chat-telemetry', () => ({
+vi.mock('@/components/native-chat/telemetry/native-chat-telemetry', () => ({
   emitNativeChatMessageSent: vi.fn(),
   emitNativeChatPickerItemAccepted: vi.fn(),
   emitNativeChatPickerOpened: vi.fn(),

@@ -5,7 +5,7 @@ import { parseExecutionHostId } from '../../../../shared/execution-host'
 import {
   prepareNativeChatCliFork,
   type NativeChatCliForkSubject
-} from '@/lib/native-chat-cli-fork-preparation'
+} from '@/lib/agent-session/resume/cli-fork/native-chat-cli-fork-preparation'
 import {
   assertAiVaultCopiedSessionLaunchAllowed,
   buildAiVaultCopiedSessionStartupForWorktree,

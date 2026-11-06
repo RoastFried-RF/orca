@@ -35,9 +35,7 @@ vi.mock('@/lib/web-client-location', () => ({
 vi.mock('@/runtime/local-runtime-capabilities', () => ({
   readLocalRuntimeCapabilitiesOrUnknown: mocks.readLocalRuntimeCapabilitiesOrUnknown
 }))
-vi.mock('@/lib/structured-agent-launch-settlement', () => ({
-  settleStructuredAgentLaunch: vi.fn()
-}))
+vi.mock('@/lib/agent-session/launch/continuation/structured-agent-launch-settlement', () => ({}))
 
 import { folderWorkspaceKey } from '../../../../../../shared/workspace-scope'
 import {

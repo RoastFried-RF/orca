@@ -1,24 +1,25 @@
 // @vitest-environment happy-dom
 import { vi, type Mock } from 'vitest'
-import type { ExecutionHostId } from '../../../shared/execution-host'
-import type { AgentJournalSubmission } from '../../../shared/agent-session/journal/agent-session-journal-types'
-import type { AgentSessionHistoryPage } from '../../../shared/agent-session/agent-session-wire'
+import type { ExecutionHostId } from '../../../../../shared/execution-host'
+import type { AgentJournalSubmission } from '../../../../../shared/agent-session/journal/agent-session-journal-types'
+import type { AgentSessionHistoryPage } from '../../../../../shared/agent-session/agent-session-wire'
 import {
   CreateIntentParams,
   SetOptionParams,
   SendParams
-} from '../../../shared/rpc-contract/structured-agent-session-params'
-import type { Tab } from '../../../shared/tab-types'
-import type { HostCreateSupport } from './agent-session/launch/structured-agent-session-host-admission'
-import { useAppStore } from '@/store'
-import { registerStructuredSelectionCatalogStore } from './structured-agent-session-selection-controller'
-import { resetStructuredAgentLaunchRegistryForTests } from './agent-session/launch/structured-agent-session-launch-registry'
-import { resetStructuredAgentLaunchPersistenceForTests } from './agent-session/launch/structured-agent-session-launch-persistence'
+} from '../../../../../shared/rpc-contract/structured-agent-session-params'
+import type { Tab } from '../../../../../shared/tab-types'
+import type { HostCreateSupport } from './structured-agent-session-host-admission'
+import { useAppStore } from '@/store/index'
+import { registerStructuredSelectionCatalogStore } from '../options/structured-agent-session-selection-controller'
+import { resetStructuredAgentLaunchRegistryForTests } from './structured-agent-session-launch-registry'
+import { resetStructuredAgentLaunchPersistenceForTests } from './structured-agent-session-launch-persistence'
 import { resetStructuredAgentSessionSendsForTests } from '@/components/native-chat/structured-agent-session-message-sender'
-import { resetStructuredAgentSessionReadOwnersForTests } from '@/components/native-chat/structured-agent-session-read-owner'
+import '@/components/native-chat/structured-agent-session-read-owner'
+import { resetStructuredAgentSessionReadOwnersForTests } from '@/components/native-chat/structured-agent-session-read-owner-registry'
 import { resetHostModelCatalogSnapshotsForTests } from '@/runtime/host-model-catalog-snapshots'
-import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
+import { startStructuredAgentLaunch } from './structured-agent-session-launch'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import {
   clearNativeChatDraftCacheForTests,
   readNativeChatDraftCache
@@ -59,7 +60,7 @@ const mocks: CreateMessageFixtureMocks = vi.hoisted(() => {
   }
 })
 const layoutOwner = vi.hoisted(() => ({ isMain: false }))
-vi.mock('../../../shared/layout-owner-switch', () => ({
+vi.mock('../../../../../shared/layout-owner-switch', () => ({
   get ORCA_LAYOUT_OWNER_IS_MAIN() {
     return layoutOwner.isMain
   }
@@ -83,13 +84,13 @@ vi.mock('@/runtime/structured-agent-session-client', () => ({
   supportsStructuredAgentSessionCreateMessage: mocks.supports,
   structuredAgentSessionHostSupports: mocks.exactSupport
 }))
-vi.mock('./agent-session/launch/structured-agent-session-host-admission', () => ({
+vi.mock('./structured-agent-session-host-admission', () => ({
   askHostCreateSupport: mocks.admit
 }))
 vi.mock('@/runtime/structured-session-tab-inventory', () => ({
   readStructuredSessionTabInventory: mocks.inventory
 }))
-vi.mock('@/store', () => {
+vi.mock('@/store/index', () => {
   const getState = () => ({
     runtimeEnvironmentCatalogHydrated: true,
     settings: mocks.settings,

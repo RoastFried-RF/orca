@@ -52,7 +52,7 @@ vi.mock('@/store/slices/tabs/tabs-host-mirroring', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   mirrorTabViewModeToHost: effects.mirrorViewMode
 }))
-vi.mock('@/lib/native-chat-telemetry', async (importOriginal) => ({
+vi.mock('@/components/native-chat/telemetry/native-chat-telemetry', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   emitNativeChatToggled: effects.chatToggled
 }))

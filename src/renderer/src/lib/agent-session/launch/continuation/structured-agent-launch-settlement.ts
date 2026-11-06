@@ -1,16 +1,17 @@
-import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
-import type { ExecutionHostId } from '../../../shared/execution-host'
-import { StructuredAgentSessionCreateRefusalError } from '@/lib/launch-structured-agent-session'
+import type { TuiAgent } from '../../../../../../shared/agent-launch/catalog/tui-agent'
+import type { ExecutionHostId } from '../../../../../../shared/execution-host'
+import '@/lib/launch-structured-agent-session'
+import { StructuredAgentSessionCreateRefusalError } from '@/lib/agent-session/launch/structured-agent-session-launch-errors'
 import {
   cancelStructuredAgentLaunch,
   startStructuredAgentLaunch
 } from '@/lib/agent-session/launch/structured-agent-session-launch'
 import type { StructuredAgentLaunchOptions } from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
-import type { StructuredPromptDeliveryResult } from '@/lib/agent-session/launch/structured-agent-session-launch-prompt'
+import type { StructuredPromptDeliveryResult } from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
 import {
   StructuredAgentSessionCreateAbandonedError,
   type StructuredAgentSessionCreateGate
-} from './agent-session/launch/structured-agent-session-launch-errors'
+} from '../structured-agent-session-launch-errors'
 
 export type StructuredAgentLaunchSettlement =
   | {
@@ -130,14 +131,4 @@ export function beginStructuredAgentLaunchSettlement(
     cancel: () => cancelStructuredAgentLaunch(worktreeId, launch.sessionId),
     ...(launch.promptDeliveryResult ? { promptDeliveryResult: launch.promptDeliveryResult } : {})
   }
-}
-
-/** Compatibility wrapper for callers that do not need the provisional identity. */
-export function settleStructuredAgentLaunch(
-  worktreeId: string,
-  agent: TuiAgent,
-  options: StructuredAgentLaunchOptions,
-  hooks: StructuredAgentLaunchHooks
-): Promise<StructuredAgentLaunchSettlement> {
-  return beginStructuredAgentLaunchSettlement(worktreeId, agent, options, hooks).settlement
 }

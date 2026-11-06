@@ -23,13 +23,13 @@ import {
   type AgentLaunchRoute,
   type AgentLaunchRoutingInput
 } from '@/lib/agent-session/launch/routing/agent-launch-routing'
-import type { NativeChatLaunchPromptDelivery } from '@/lib/native-chat-launch-prompt-delivery'
+import type { NativeChatLaunchPromptDelivery } from '@/lib/agent-session/launch/prompt/native-chat-launch-prompt-delivery'
 import {
   beginStructuredAgentLaunchSettlement,
   type StructuredAgentLaunchHandle,
   type StructuredAgentLaunchHooks,
   type StructuredAgentLaunchSettlement
-} from '@/lib/structured-agent-launch-settlement'
+} from '@/lib/agent-session/launch/continuation/structured-agent-launch-settlement'
 import type { StructuredAgentLaunchOptions } from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
 import type { AgentLaunchRequestId } from '@/lib/agent-session/launch/routing/agent-launch-request-id'
 import { relearnHostStructuredAgents } from '@/runtime/host-structured-agents'

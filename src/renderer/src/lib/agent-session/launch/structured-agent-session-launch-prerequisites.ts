@@ -1,16 +1,16 @@
 import type {
   SelectionOperation,
   SelectionOutcome
-} from '../../../shared/agent-session/options/structured-agent-session-selection-operations'
-import type { AgentSessionWriteFailure } from '../../../shared/agent-session/failures/agent-session-write-failure'
+} from '../../../../../shared/agent-session/options/structured-agent-session-selection-operations'
+import type { AgentSessionWriteFailure } from '../../../../../shared/agent-session/failures/agent-session-write-failure'
 import {
   STRUCTURED_LAUNCH_OPTION_IDS,
   structuredLaunchCompatibleOptions,
   structuredLaunchRequestedOptions
-} from '../../../shared/native-chat/input/native-chat-session-option-defaults'
-import type { structuredSessionSelectionController } from './structured-agent-session-selection-controller'
-import type { StructuredLaunchState } from './agent-session/launch/structured-agent-session-launch-registry'
-import { StructuredAgentSessionLaunchCancelledError } from './agent-session/launch/structured-agent-session-launch-recovery'
+} from '../../../../../shared/native-chat/input/native-chat-session-option-defaults'
+import type { structuredSessionSelectionController } from '../options/structured-agent-session-selection-controller'
+import type { StructuredLaunchState } from './structured-agent-session-launch-registry'
+import { StructuredAgentSessionLaunchCancelledError } from './structured-agent-session-launch-recovery'
 
 export type LegacyPrerequisites = {
   intent: StructuredLaunchState['intent']

@@ -12,7 +12,7 @@ import {
   start,
   draft,
   deferred
-} from '../../structured-agent-session-launch-create-message.test-fixture'
+} from './structured-agent-session-launch-create-message.test-fixture'
 import {
   startStructuredAgentLaunch,
   retryStructuredAgentSessionLaunch,

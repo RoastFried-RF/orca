@@ -10,10 +10,10 @@ import {
   structuredAgentSessionSendOut
 } from '@/components/native-chat/structured-agent-session-pending-sends'
 import { structuredConversationCommandRunner } from '@/components/native-chat/structured-conversation-command-send'
-import { sendMessageToAgent } from './agent-message-send'
+import { sendMessageToAgent } from '../../agent-message-send'
 import { recordHostModelCatalogSnapshot } from '@/runtime/host-model-catalog-snapshots'
-import { getStructuredLaunchStateBySessionId } from './agent-session/launch/structured-agent-session-launch-registry'
-import { structuredSessionSelectionController } from './structured-agent-session-selection-controller'
+import { getStructuredLaunchStateBySessionId } from './structured-agent-session-launch-registry'
+import { structuredSessionSelectionController } from '../options/structured-agent-session-selection-controller'
 import {
   mocks,
   deferred,

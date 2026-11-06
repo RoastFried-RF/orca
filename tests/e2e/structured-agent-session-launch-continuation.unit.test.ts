@@ -5,7 +5,7 @@ import {
   cleanupCreateMessageFixture,
   created,
   createParams
-} from '../../src/renderer/src/lib/structured-agent-session-launch-create-message.test-fixture'
+} from '../../src/renderer/src/lib/agent-session/launch/structured-agent-session-launch-create-message.test-fixture'
 import type { AgentSessionModelCatalogResult } from '../../src/shared/agent-session/agent-session-wire'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'

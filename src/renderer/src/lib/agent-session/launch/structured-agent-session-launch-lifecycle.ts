@@ -1,7 +1,7 @@
 import type {
   StructuredLaunchState,
   StructuredAgentSessionLaunchLifecycle
-} from './agent-session/launch/structured-agent-session-launch-registry'
+} from './structured-agent-session-launch-registry'
 
 export function launchStateLifecycle(
   state: StructuredLaunchState

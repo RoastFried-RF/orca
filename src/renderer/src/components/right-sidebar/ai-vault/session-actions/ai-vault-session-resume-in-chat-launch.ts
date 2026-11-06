@@ -27,7 +27,7 @@ import { structuredLaunchFailure } from '@/lib/agent-session/launch/structured-a
 import { workspaceHasSleepingAgentSessions } from '@/lib/worktree-agent-activation-gate'
 import { resolveWebSessionVisibleTabId } from '@/runtime/web-session-focus-intent'
 import type { TuiAgent } from '../../../../../../shared/agent-launch/catalog/tui-agent'
-import type { StructuredAgentLaunchSettlement } from '@/lib/structured-agent-launch-settlement'
+import type { StructuredAgentLaunchSettlement } from '@/lib/agent-session/launch/continuation/structured-agent-launch-settlement'
 import type { NativeChatComposerFocusIntent } from '@/components/native-chat/use-native-chat-composer-reveal-focus'
 
 /** A chat the resumed one takes the place of: it opens right after that tab. */
