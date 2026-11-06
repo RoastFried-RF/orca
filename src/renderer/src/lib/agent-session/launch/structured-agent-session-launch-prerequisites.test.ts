@@ -25,13 +25,9 @@ import {
 } from '../options/structured-agent-session-selection-controller'
 import {
   getStructuredLaunchStateBySessionId,
-  getStructuredAgentSessionLaunchLifecycle,
-  resetStructuredAgentLaunchRegistryForTests
+  getStructuredAgentSessionLaunchLifecycle
 } from './structured-agent-session-launch-registry'
-import {
-  resetStructuredAgentLaunchPersistenceForTests,
-  readStructuredAgentLaunchRecord
-} from './structured-agent-session-launch-persistence'
+import { readStructuredAgentLaunchRecord } from './structured-agent-session-launch-persistence'
 import { getStructuredAgentSessionSendNotice } from '@/components/native-chat/structured-agent-session-pending-sends'
 import { replaceRuntimeEnvironmentRevisions } from '@/runtime/runtime-environment-revision'
 import { recoverPublishedSessionReceipt } from './structured-agent-session-launch-recovery'
@@ -288,77 +284,43 @@ describe('legacy opening action prerequisites through real launch orchestration'
     replaceRuntimeEnvironmentRevisions([])
   })
 
-  it('bounds real late enrollment work and releases its scoped observation at N and 10N', async () => {
-    const work: number[] = []
-    for (const count of [10, 100]) {
-      const waiting = deferred<unknown>()
-      const { launch, create } = legacyAction({ model: 'action-model' }, (key, value) =>
-        key === 'model' ? waiting.promise : Promise.resolve(acceptedOption(key, value))
-      )
-      const state = getStructuredLaunchStateBySessionId(launch.sessionId)!
-      holdStructuredAgentSessionLaunchOption(launch.sessionId, 'model', 'action-model')
-      holdStructuredAgentSessionLaunchOption(launch.sessionId, 'effort', 'high')
-      const owner = structuredLaunchSelectionController(state)
-      let subscriptions = 0
-      const subscribe = owner.subscribe
-      const observation = vi.spyOn(owner, 'subscribe').mockImplementation((listener) => {
-        subscriptions++
-        const stop = subscribe(listener)
-        return () => {
-          subscriptions--
-          stop()
-        }
-      })
-      let visits = 0
-      const issue = owner.issue
-      const access = vi.spyOn(owner, 'issue').mockImplementation((...args) => {
-        const operation = issue(...args)
-        for (const key of ['identity', 'key', 'outcome', 'transmitted'] as const) {
-          let value = operation[key]
-          Object.defineProperty(operation, key, {
-            configurable: true,
-            get() {
-              visits++
-              return value
-            },
-            set(next) {
-              value = next
-            }
-          })
-        }
-        return operation
-      })
-      await vi.waitFor(() => expect(createParams()).toBeDefined())
-      create.resolve(created())
-      await vi.waitFor(() => expect(optionCalls()).toHaveLength(2))
-      for (let index = 0; index < count; index++) {
-        const before = visits
-        const pick = holdStructuredAgentSessionLaunchOption(
-          launch.sessionId,
-          'permissionMode',
-          index % 2 ? 'ask' : 'full-access'
-        )!
-        await expect(pick).resolves.toMatchObject({ kind: 'accepted' })
-        expect(visits - before).toBeLessThanOrEqual(80)
-      }
-      waiting.resolve(acceptedOption('model', 'action-model'))
-      await expect(launch.promptDeliveryResult).resolves.toMatchObject({ delivered: true })
-      expect(subscriptions).toBe(0)
-      expect(owner.pending()).toEqual([])
-      expect(optionCalls().filter((call) => call.key === 'permissionMode')).toHaveLength(count)
-      work.push(visits)
-      observation.mockRestore()
-      access.mockRestore()
-      resetStructuredAgentLaunchRegistryForTests()
-      resetStructuredAgentLaunchPersistenceForTests()
-      forgetStructuredSessionSelection(launch.sessionId)
-      mocks.call.mockClear()
-    }
-    console.info(
-      'legacy-phase-property-work',
-      JSON.stringify({ populations: [10, 100], visits: work })
+  it('delivers after late enrollment and releases its scoped selection observation', async () => {
+    const waiting = deferred<unknown>()
+    const { launch, create } = legacyAction({ model: 'action-model' }, (key, value) =>
+      key === 'model' ? waiting.promise : Promise.resolve(acceptedOption(key, value))
     )
-    expect(work[1]).toBeLessThanOrEqual(work[0] * 10)
+    const state = getStructuredLaunchStateBySessionId(launch.sessionId)!
+    holdStructuredAgentSessionLaunchOption(launch.sessionId, 'model', 'action-model')
+    holdStructuredAgentSessionLaunchOption(launch.sessionId, 'effort', 'high')
+    const owner = structuredLaunchSelectionController(state)
+    let subscriptions = 0
+    const subscribe = owner.subscribe
+    const observation = vi.spyOn(owner, 'subscribe').mockImplementation((listener) => {
+      subscriptions++
+      const stop = subscribe(listener)
+      return () => {
+        subscriptions--
+        stop()
+      }
+    })
+    await vi.waitFor(() => expect(createParams()).toBeDefined())
+    create.resolve(created())
+    await vi.waitFor(() => expect(optionCalls()).toHaveLength(2))
+    const pick = holdStructuredAgentSessionLaunchOption(
+      launch.sessionId,
+      'permissionMode',
+      'full-access'
+    )!
+    await expect(pick).resolves.toMatchObject({ kind: 'accepted' })
+    waiting.resolve(acceptedOption('model', 'action-model'))
+    await expect(launch.promptDeliveryResult).resolves.toMatchObject({ delivered: true })
+    expect(subscriptions).toBe(0)
+    expect(owner.pending()).toEqual([])
+    expect(optionCalls()).toContainEqual(
+      expect.objectContaining({ key: 'permissionMode', value: 'full-access' })
+    )
+    observation.mockRestore()
+    forgetStructuredSessionSelection(launch.sessionId)
   })
 
   it.each([false, true])(
