@@ -6,8 +6,10 @@ import {
   cancelStructuredAgentLaunch,
   startStructuredAgentLaunch
 } from '@/lib/agent-session/launch/structured-agent-session-launch'
-import type { StructuredAgentLaunchOptions } from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
-import type { StructuredPromptDeliveryResult } from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
+import type {
+  StructuredAgentLaunchOptions,
+  StructuredPromptDeliveryResult
+} from '@/lib/agent-session/launch/structured-agent-session-launch-callers'
 import {
   StructuredAgentSessionCreateAbandonedError,
   type StructuredAgentSessionCreateGate
