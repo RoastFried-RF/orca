@@ -1,25 +1,25 @@
 import { entry } from './source-control-agent-picker-test-fixture'
 
-import { agentModelChoiceChips } from '../components/agent/launch-settings/agent-model-choice-chips'
+import { agentModelChoiceChips } from '../../../components/agent/launch-settings/agent-model-choice-chips'
 
 import { expect, it } from 'vitest'
 import {
   agentPickerLaunchInputs,
   type AgentPickerEntry
-} from '../../../shared/agent-launch/picker/agent-launch-picker'
-import { getDefaultSettings } from '../../../shared/constants'
+} from '../../../../../shared/agent-launch/picker/agent-launch-picker'
+import { getDefaultSettings } from '../../../../../shared/constants'
 
-import { applyAgentPickerEdit } from '../../../shared/agent-launch/picker/agent-launch-picker-edits'
-import { captureSourceControlActionSelection } from '../../../shared/source-control/ai/source-control-ai-operation-policy'
+import { applyAgentPickerEdit } from '../../../../../shared/agent-launch/picker/agent-launch-picker-edits'
+import { captureSourceControlActionSelection } from '../../../../../shared/source-control/ai/source-control-ai-operation-policy'
 import {
   canonicalSourceControlActionSelection,
   selectSourceControlActionRecipe
-} from '../../../shared/source-control/ai/recipes/source-control-action-selection'
-import { projectSourceControlActionLaunch } from '../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
+} from '../../../../../shared/source-control/ai/recipes/source-control-action-selection'
+import { projectSourceControlActionLaunch } from '../../../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
 
-import { agentPickerPanelArguments } from '../../../shared/agent-launch/picker/agent-launch-picker-arguments'
-import { saveSourceControlActionRecipe } from '../../../shared/source-control/ai/settings/source-control-ai-recipe-save'
-import { resolveAgentLaunchCommand } from '../../../shared/agent-launch/startup/tui-agent-launch-command'
+import { agentPickerPanelArguments } from '../../../../../shared/agent-launch/picker/agent-launch-picker-arguments'
+import { saveSourceControlActionRecipe } from '../../../../../shared/source-control/ai/settings/source-control-ai-recipe-save'
+import { resolveAgentLaunchCommand } from '../../../../../shared/agent-launch/startup/tui-agent-launch-command'
 import {
   applySourceControlPickerDraft,
   sourceControlPickerDraft
@@ -364,7 +364,7 @@ it.each([
   'compiles current %s model context and deliberate dependent options without losing initial/resume intent',
   async (agent, raw, options, expected, baseOptions) => {
     const { tokenizeStartupCommand } =
-      await import('../../../shared/agent-launch/startup/tui-agent-startup-shell')
+      await import('../../../../../shared/agent-launch/startup/tui-agent-startup-shell')
     const inventory: AgentPickerEntry = {
       ...entry,
       agent,
@@ -402,7 +402,7 @@ it.each([
       tokens: expected
     })
     const { buildAgentResumeStartupPlan } =
-      await import('../../../shared/agent-launch/startup/tui-agent-resume-startup')
+      await import('../../../../../shared/agent-launch/startup/tui-agent-resume-startup')
     const resumed = buildAgentResumeStartupPlan({
       agent,
       cmdOverrides: {},

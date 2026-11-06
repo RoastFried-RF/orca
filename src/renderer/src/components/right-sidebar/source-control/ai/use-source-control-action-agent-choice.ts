@@ -17,7 +17,7 @@ import {
   sourceControlRepoAgentRows,
   sourceControlAgentPickerSelection,
   type SourceControlAgentRows
-} from '@/lib/source-control-agent-picker'
+} from '@/lib/source-control/ai/source-control-agent-picker'
 import { isSourceControlAgentDetectedAndEnabled } from './source-control-agent-action-dialog-support'
 
 const NO_AGENTS: TuiAgent[] = []

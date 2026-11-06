@@ -1,30 +1,30 @@
-import * as profile from '../../../shared/agent-launch/choices/agent-launch-profile'
+import * as profile from '../../../../../shared/agent-launch/choices/agent-launch-profile'
 import { entry } from './source-control-agent-picker-test-fixture'
 import { readFileSync } from 'node:fs'
 
 import { z } from 'zod'
 import { describe, expect, it, vi } from 'vitest'
-import * as reconciliation from '../../../shared/agent-launch/choices/agent-choice-reconciliation'
+import * as reconciliation from '../../../../../shared/agent-launch/choices/agent-choice-reconciliation'
 import {
   agentPickerEffectiveChoices,
   agentPickerLaunchInputs,
   type AgentPickerEntry
-} from '../../../shared/agent-launch/picker/agent-launch-picker'
-import { getDefaultSettings } from '../../../shared/constants'
+} from '../../../../../shared/agent-launch/picker/agent-launch-picker'
+import { getDefaultSettings } from '../../../../../shared/constants'
 
 import {
   acceptAgentPickerArguments,
   applyAgentPickerEdit,
   type AgentPickerEdit
-} from '../../../shared/agent-launch/picker/agent-launch-picker-edits'
-import { captureSourceControlActionSelection } from '../../../shared/source-control/ai/source-control-ai-operation-policy'
+} from '../../../../../shared/agent-launch/picker/agent-launch-picker-edits'
+import { captureSourceControlActionSelection } from '../../../../../shared/source-control/ai/source-control-ai-operation-policy'
 import {
   canonicalSourceControlActionSelection,
   selectSourceControlActionRecipe
-} from '../../../shared/source-control/ai/recipes/source-control-action-selection'
-import { projectSourceControlActionLaunch } from '../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
-import { tokenizeStartupCommand } from '../../../shared/agent-launch/startup/tui-agent-startup-shell'
-import { agentPickerPanelArguments } from '../../../shared/agent-launch/picker/agent-launch-picker-arguments'
+} from '../../../../../shared/source-control/ai/recipes/source-control-action-selection'
+import { projectSourceControlActionLaunch } from '../../../../../shared/source-control/ai/recipes/source-control-action-launch-preferences'
+import { tokenizeStartupCommand } from '../../../../../shared/agent-launch/startup/tui-agent-startup-shell'
+import { agentPickerPanelArguments } from '../../../../../shared/agent-launch/picker/agent-launch-picker-arguments'
 
 import {
   applySourceControlPickerDraft,
@@ -474,7 +474,10 @@ it('retains captured full model names and absent readback/catalog fields through
     frame: z.object({ type: z.literal('system'), subtype: z.literal('init'), model: z.string() })
   })
   const init = readFileSync(
-    new URL('../../../main/claude/__fixtures__/claude-adapter-capture-fold.jsonl', import.meta.url),
+    new URL(
+      '../../../../../main/claude/__fixtures__/claude-adapter-capture-fold.jsonl',
+      import.meta.url
+    ),
     'utf8'
   )
     .trim()
@@ -485,7 +488,7 @@ it('retains captured full model names and absent readback/catalog fields through
     throw new Error('Captured init missing')
   }
   const { default: recorded } =
-    await import('../../../shared/fixtures/agent-picker-cli-recordings.json')
+    await import('../../../../../shared/fixtures/agent-picker-cli-recordings.json')
   for (const [agent, model] of [
     ['claude', init.data.frame.model],
     ['codex', recorded.modelList.data[0].model]

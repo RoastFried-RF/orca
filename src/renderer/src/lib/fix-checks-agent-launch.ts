@@ -3,8 +3,8 @@ import type { AgentLaunchPreferences } from '@/runtime/agent-launch-settings/hos
 import {
   resolveChecksActionAgent,
   sourceControlRepoAgentRows
-} from '@/lib/source-control-agent-picker'
-export { resolveChecksActionAgent } from '@/lib/source-control-agent-picker'
+} from '@/lib/source-control/ai/source-control-agent-picker'
+export { resolveChecksActionAgent } from '@/lib/source-control/ai/source-control-agent-picker'
 import {
   AgentLaunchChoiceCancelled,
   acquireAgentLaunchChoices

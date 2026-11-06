@@ -1,4 +1,5 @@
-import { type AppState, useAppStore } from '@/store'
+import type { AppState } from '@/store/types'
+import { useAppStore } from '@/store/index'
 import {
   confirmRuntimeTerminalForegroundProcess,
   inspectRuntimeTerminalProcess
@@ -8,8 +9,8 @@ import { translate } from '@/i18n/i18n'
 import {
   getCodexAccountDisplayLabel,
   normalizeCodexAccountEmail
-} from './codex-account-display-label'
-import { isShellProcess } from '../../../shared/agent-status/process/shell-process-detection'
+} from '../../../codex-account-display-label'
+import { isShellProcess } from '../../../../../../shared/agent-status/process/shell-process-detection'
 import {
   isCodexForegroundProcess,
   isCodexRestartEligiblePane
@@ -17,16 +18,16 @@ import {
 import {
   type TerminalProcessInspection as RuntimeTerminalProcessInspection,
   isClientOnlyUnverifiableInspection
-} from '../../../shared/terminal/pty/lifecycle/terminal-process-inspection'
+} from '../../../../../../shared/terminal/pty/lifecycle/terminal-process-inspection'
 import {
   getCodexAccountSwitchLaneMatcher,
   isForeignMachineCodexPtyId,
   isLocalCodexSelectionLaneKey,
   resolveCodexPaneSelectionLane
-} from './codex-pane-selection-lane'
-import type { CodexAccountSelectionTarget } from '../../../shared/codex-selection-lane'
-import type { RuntimeClientTarget } from '../../../shared/runtime-client-target'
-import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
+} from '../../../codex-pane-selection-lane'
+import type { CodexAccountSelectionTarget } from '../../../../../../shared/codex-selection-lane'
+import type { RuntimeClientTarget } from '../../../../../../shared/runtime-client-target'
+import type { TuiAgent } from '../../../../../../shared/agent-launch/catalog/tui-agent'
 
 export type CodexPaneScanResult = {
   ptyId: string

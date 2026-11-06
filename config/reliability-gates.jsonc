@@ -8471,7 +8471,7 @@
         "Manual headed paired-server journey: isolated Orca desktop host + separate paired web client + real Codex process + 20-second WebSocket fault + reconnect + explicit stop",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/terminal/adoption/terminal-orphan-topology.test.ts src/renderer/src/runtime/web-session-terminal-orphan-recovery.test.ts src/renderer/src/runtime/web-session-terminal-orphan-mixed-version.test.ts --maxWorkers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/providers/pty-process-inspection.test.ts src/main/daemon/terminal-host/testing/terminal-host.test.ts src/main/daemon/providers/routing/testing/daemon-pty-router.test.ts src/main/daemon/providers/routing/testing/degraded-daemon-pty-provider.test.ts src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts src/main/runtime/orca-runtime.test.ts tests/e2e/remote-agent-completion-authority.unit.test.ts src/renderer/src/runtime/runtime-terminal-inspection.test.ts src/renderer/src/components/terminal-pane/agent-completion-coordinator-process-cadence.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/remote-agent-completion-authority.unit.test.ts src/main/providers/pty-process-inspection.test.ts src/main/daemon/terminal-host/testing/terminal-host.test.ts src/main/daemon/providers/routing/testing/daemon-pty-router.test.ts src/main/daemon/providers/routing/testing/degraded-daemon-pty-provider.test.ts src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts src/renderer/src/runtime/runtime-terminal-inspection.test.ts src/renderer/src/components/terminal-pane/agent-completion-coordinator-process-cadence.test.ts src/renderer/src/components/terminal-pane/pty-connection-completion-and-notification.test.ts src/renderer/src/lib/codex-session-restart.test.ts"
+        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/remote-agent-completion-authority.unit.test.ts src/main/providers/pty-process-inspection.test.ts src/main/daemon/terminal-host/testing/terminal-host.test.ts src/main/daemon/providers/routing/testing/daemon-pty-router.test.ts src/main/daemon/providers/routing/testing/degraded-daemon-pty-provider.test.ts src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts src/renderer/src/runtime/runtime-terminal-inspection.test.ts src/renderer/src/components/terminal-pane/agent-completion-coordinator-process-cadence.test.ts src/renderer/src/components/terminal-pane/pty-connection-completion-and-notification.test.ts src/renderer/src/lib/agent-session/accounts/codex/codex-session-restart.test.ts"
       ],
       "testFiles": [
         "src/main/providers/pty-process-inspection.test.ts",
@@ -8483,7 +8483,7 @@
         "src/renderer/src/runtime/runtime-terminal-inspection.test.ts",
         "src/renderer/src/components/terminal-pane/agent-completion-coordinator-process-cadence.test.ts",
         "src/renderer/src/components/terminal-pane/pty-connection-completion-and-notification.test.ts",
-        "src/renderer/src/lib/codex-session-restart.test.ts",
+        "src/renderer/src/lib/agent-session/accounts/codex/codex-session-restart.test.ts",
         "src/shared/claimed-agent-pty-owner.test.ts",
         "src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts",
         "src/main/runtime/orca-runtime-agent-session-operation.test.ts",
@@ -8526,7 +8526,7 @@
           ]
         },
         {
-          "file": "src/renderer/src/lib/codex-session-restart.test.ts",
+          "file": "src/renderer/src/lib/agent-session/accounts/codex/codex-session-restart.test.ts",
           "assertions": [
             "one unreachable pane cannot suppress restart notices for another authoritatively confirmed Codex pane"
           ]

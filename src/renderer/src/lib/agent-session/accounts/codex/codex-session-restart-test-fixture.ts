@@ -1,4 +1,4 @@
-import type { RemoteForegroundEvidence } from '../../../shared/foreground-process-evidence'
+import type { RemoteForegroundEvidence } from '../../../../../../shared/foreground-process-evidence'
 
 export function liveRemoteEvidence(ptyId: string, processName = 'codex'): RemoteForegroundEvidence {
   return {

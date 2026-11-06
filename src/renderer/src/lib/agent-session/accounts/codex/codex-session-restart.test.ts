@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAppStore } from '@/store'
+import { useAppStore } from '@/store/index'
 import { defaultScopeHost } from '@/lib/default-creation-host'
 
 // Why: these cases model a switch made on the focused host, as the status bar does.
@@ -10,7 +10,7 @@ const markForFocusedHost = (
     owner: defaultScopeHost(useAppStore.getState().settings),
     ...args
   })
-import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
+import type { TuiAgent } from '../../../../../../shared/agent-launch/catalog/tui-agent'
 import { markLiveCodexSessionsForRestart } from './codex-session-restart'
 import {
   createCompatibleRuntimeStatusResponseIfNeeded,
