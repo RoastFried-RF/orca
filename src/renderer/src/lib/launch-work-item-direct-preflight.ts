@@ -18,12 +18,12 @@ import { resolveDefaultAgentForWorkspace } from './agent-tab-shortcuts'
 import { isTuiAgent } from '../../../shared/agent-launch/catalog/tui-agent-config'
 import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
 import type { ProjectLaunchContext } from '../../../shared/rpc-contract/preflight-params'
-import type { AgentLaunchRequestId } from './agent-launch-request-id'
+import type { AgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
 import {
   awaitStructuredRouteHostAnswer,
   planAgentSessionLaunch,
   type AgentSessionLaunchRequest
-} from './agent-session-launch-plan'
+} from './agent-session/launch/routing/agent-session-launch-plan'
 import { resolveGitHubPrStartPointForRepo } from '@/lib/github-pr-start-point'
 import type { RuntimeClientTarget } from '../../../shared/runtime-client-target'
 import { getRepoExecutionHostId, type ExecutionHostId } from '../../../shared/execution-host'

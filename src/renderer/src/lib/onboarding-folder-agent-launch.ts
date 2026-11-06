@@ -4,12 +4,12 @@ import type { ExecutionHostId } from '../../../shared/execution-host'
 import type { OnboardingState } from '../../../shared/onboarding-state-types'
 import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
 import type { useAppStore } from '@/store'
-import { resolveAgentLaunchExecutionContext } from '@/lib/launch-agent-execution-context'
+import { resolveAgentLaunchExecutionContext } from '@/lib/agent-session/launch/new-tab/launch-agent-execution-context'
 import {
   planAgentSessionLaunch,
   type AgentSessionLaunchPlan
-} from '@/lib/agent-session-launch-plan'
-import { newAgentLaunchRequestId } from '@/lib/agent-launch-request-id'
+} from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
+import { newAgentLaunchRequestId } from '@/lib/agent-session/launch/routing/agent-launch-request-id'
 import {
   buildOnboardingFolderAgentStartup,
   onboardingFolderDefaultAgent,

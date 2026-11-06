@@ -76,7 +76,7 @@ vi.mock('@/lib/windows-terminal-capabilities', async (importOriginal) => ({
 }))
 
 const load = perClientLoader(async () => ({
-  launch: await import('@/lib/launch-agent-in-new-tab'),
+  launch: await import('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab'),
   quick: await import('@/lib/run-quick-command-in-new-tab'),
   vault: await import('@/lib/launch-ai-vault-session'),
   resume: await import('@/lib/ai-vault-resume-command'),

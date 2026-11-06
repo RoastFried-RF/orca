@@ -7,7 +7,7 @@ import {
 import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
 import { holdStructuredAgentSessionLaunchOption } from './agent-session/launch/structured-agent-session-launch-options'
 import { recordHostModelCatalogSnapshot } from '@/runtime/host-model-catalog-snapshots'
-import { newAgentLaunchRequestId } from './agent-launch-request-id'
+import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
 export { registerCreateSelectionTests } from './structured-agent-session-create-selection.test-fixture'
 
 export function registerActionEffortCreateTests(
@@ -30,7 +30,8 @@ export function registerActionEffortCreateTests(
   ] as const)(
     'carries captured raw source through actual admitted $host planning, create and recovery (ordinary=$ordinary)',
     async ({ host, ordinary }) => {
-      const { planAgentSessionLaunch } = await import('./agent-session-launch-plan')
+      const { planAgentSessionLaunch } =
+        await import('./agent-session/launch/routing/agent-session-launch-plan')
       const { useAppStore } = await import('@/store')
       const { setLocalRuntimeCapabilitiesForTests } =
         await import('@/runtime/local-runtime-capabilities')

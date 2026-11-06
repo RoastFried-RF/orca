@@ -11,7 +11,7 @@ import { admitStructuredAgentSession } from './agent-session/structured-agent-se
 import { renderHook } from '@testing-library/react'
 import { useNativeChatProvisionalLaunch } from '@/components/native-chat/use-native-chat-provisional-launch'
 import { getStructuredLaunchStateBySessionId } from './agent-session/launch/structured-agent-session-launch-registry'
-import { newAgentLaunchRequestId } from './agent-launch-request-id'
+import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
 import {
   getStructuredAgentSessionPendingSends,
   getStructuredAgentSessionSendNotice

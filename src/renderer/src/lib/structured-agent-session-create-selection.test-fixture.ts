@@ -4,7 +4,7 @@ import { expect, it, vi } from 'vitest'
 import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
 import { holdStructuredAgentSessionLaunchOption } from './agent-session/launch/structured-agent-session-launch-options'
 import { recordHostModelCatalogSnapshot } from '@/runtime/host-model-catalog-snapshots'
-import { newAgentLaunchRequestId } from './agent-launch-request-id'
+import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
 import {
   mocks,
   deferred,

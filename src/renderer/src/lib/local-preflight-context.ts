@@ -10,7 +10,7 @@ import {
 import { getRepoExecutionHostId, LOCAL_EXECUTION_HOST_ID } from '../../../shared/execution-host'
 import type { Repo } from '../../../shared/repo-types'
 import type { Worktree } from '../../../shared/worktree/types'
-import type { ResolvedAgentBackgroundTarget } from './agent-background-session-contract'
+import type { ResolvedAgentBackgroundTarget } from './agent-session/launch/background/agent-background-session-contract'
 import { parseWorkspaceKey } from '../../../shared/workspace-scope'
 import { projectMatchesRepo } from '../../../shared/project-repo-match'
 import { getIndexedRepoMap, getIndexedReposById } from '@/store/worktree-repo-index'

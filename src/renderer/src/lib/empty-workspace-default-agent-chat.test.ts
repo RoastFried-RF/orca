@@ -13,10 +13,10 @@ const mocks = vi.hoisted(() => ({
   seedShell: vi.fn(() => true)
 }))
 
-vi.mock('@/lib/launch-agent-in-new-tab', () => ({
+vi.mock('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab', () => ({
   launchAgentInNewTab: mocks.launchAgentInNewTab
 }))
-vi.mock('@/lib/agent-session-launch-plan', () => ({
+vi.mock('@/lib/agent-session/launch/routing/agent-session-launch-plan', () => ({
   planAgentSessionLaunch: mocks.planAgentSessionLaunch
 }))
 vi.mock('@/hooks/useAgentDetectionTarget', async (importOriginal) => ({

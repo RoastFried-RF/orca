@@ -6,7 +6,7 @@ import {
   buildAiVaultResumeStartupForWorktree
 } from './ai-vault-resume-command'
 import { getAiVaultResumeWorkspaceWslDistro } from './ai-vault-resume-shell'
-import { buildAgentLaunchRouteInput } from './agent-launch-route-input'
+import { buildAgentLaunchRouteInput } from './agent-session/launch/routing/agent-launch-route-input'
 import { getLocalProjectExecutionRuntimeContext } from './local-preflight-context'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 import { createGlobalSettingsFixture } from '../../../shared/global-settings-test-fixture'

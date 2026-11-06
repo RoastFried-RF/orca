@@ -20,7 +20,7 @@ import type { WorktreeStartupLaunch } from '../../../shared/worktree/launch-type
 import type { AgentStartupPlan } from '../../../shared/agent-launch/startup/tui-agent-startup'
 import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
 import type { TaskSourceContext, WorkspaceRunContext } from '../../../shared/task-source-context'
-import type { AgentLaunchRoute } from '@/lib/agent-launch-routing'
+import type { AgentLaunchRoute } from '@/lib/agent-session/launch/routing/agent-launch-routing'
 import { translate } from '@/i18n/i18n'
 import type { NativeChatComposerDraftImage } from '@/components/native-chat/native-chat-composer-draft-storage'
 import type { AgentJournalSkillRef } from '../../../shared/agent-session/journal/agent-session-journal-types'

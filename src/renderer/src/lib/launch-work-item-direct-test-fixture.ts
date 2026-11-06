@@ -4,6 +4,7 @@ import type * as TuiAgentSelectionModule from '../../../shared/agent-launch/cata
 import type * as TuiAgentStartupModule from '../../../shared/agent-launch/startup/tui-agent-startup'
 import type * as DirectAgentRoutingModule from '@/lib/launch-work-item-direct-agent-routing'
 import type * as RuntimeRpcSubscribeModule from '@/runtime/runtime-rpc-subscribe'
+import type * as LaunchAgentKindModule from '../../../shared/agent-kind'
 
 type DirectLaunchStoreActions = {
   ensureDetectedAgents: Mock
@@ -130,7 +131,12 @@ vi.mock('@/lib/new-workspace', () => ({
 
 vi.mock('@/lib/telemetry', () => ({
   track: vi.fn(),
-  tuiAgentToAgentKind: (agent: string) => agent
+  tuiAgentToAgentKind: mockLaunchAgentKind
+}))
+const mockLaunchAgentKind = vi.hoisted(() => (agent: string) => agent)
+vi.mock('../../../shared/agent-kind', async (importOriginal) => ({
+  ...(await importOriginal<typeof LaunchAgentKindModule>()),
+  tuiAgentToAgentKind: mockLaunchAgentKind
 }))
 
 vi.mock('../../../shared/agent-launch/startup/tui-agent-startup', async () => {

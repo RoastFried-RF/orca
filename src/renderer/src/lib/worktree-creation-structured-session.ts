@@ -1,8 +1,8 @@
 import { useAppStore } from '@/store'
 import { translate } from '@/i18n/i18n'
 import { activateAndRevealWorktree, type ActivateAndRevealResult } from '@/lib/worktree-activation'
-import { adoptAgentSessionLaunchVerdict } from '@/lib/agent-session-launch-plan'
-import type { AgentLaunchRoute } from '@/lib/agent-launch-routing'
+import { adoptAgentSessionLaunchVerdict } from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
+import type { AgentLaunchRoute } from '@/lib/agent-session/launch/routing/agent-launch-routing'
 import {
   pendingCreationChatDraftScopeKey,
   withPendingChatInput,
@@ -240,7 +240,8 @@ export async function launchStructuredWorktreeSession(
       }
       let recoveryProvidesSurface = false
       if (primaryTabId === null && plan.prompt && layoutRefused) {
-        const { launchAgentInNewTabWithOutcome } = await import('@/lib/launch-agent-in-new-tab')
+        const { launchAgentInNewTabWithOutcome } =
+          await import('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab')
         if (abandoned.signal.aborted || isCancelled()) {
           launch.cancel()
           return { ...settled, cancelled: true, activation, primaryTabId }

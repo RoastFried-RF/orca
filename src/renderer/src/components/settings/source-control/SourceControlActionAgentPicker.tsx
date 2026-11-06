@@ -21,7 +21,7 @@ import {
   savedSurfaceForPick,
   type SourceControlAgentRows
 } from '@/lib/source-control-agent-picker'
-import { buildAgentLaunchRouteInput } from '@/lib/agent-launch-route-input'
+import { buildAgentLaunchRouteInput } from '@/lib/agent-session/launch/routing/agent-launch-route-input'
 import { AGENT_LAUNCH_SURFACE_RUNTIME_CAPABILITY } from '../../../../../shared/agent-launch/contracts/agent-launch-runtime-capability'
 import type { SourceControlActionRecipe } from '../../../../../shared/source-control/ai/recipes/source-control-ai-actions'
 import type { TuiAgent } from '../../../../../shared/agent-launch/catalog/tui-agent'

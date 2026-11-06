@@ -3,7 +3,7 @@ import {
   structuredLaunchStates,
   type StructuredLaunchState
 } from './structured-agent-session-launch-registry'
-import type { AgentLaunchRequestId } from '../../agent-launch-request-id'
+import type { AgentLaunchRequestId } from './routing/agent-launch-request-id'
 
 // Coalesce re-delivery of one action only. Other actions and failed/unconfirmed retries open independent chats/text; conversation resumes still hold because hosts refuse duplicate adoption.
 function holdsLaunchIdentity(

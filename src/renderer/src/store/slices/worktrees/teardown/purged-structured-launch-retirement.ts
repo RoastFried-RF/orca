@@ -4,7 +4,7 @@ import type { TerminalTab } from '../../../../../../shared/workspace-layout/term
 import type { Tab } from '../../../../../../shared/tab-types'
 import type { AppState } from '../../../types'
 import { forgetStructuredSessionSelection } from '@/lib/structured-agent-session-selection-controller'
-import { settleAgentLaunchPaneStart } from '@/lib/agent-launch-pane-start'
+import { settleAgentLaunchPaneStart } from '@/lib/agent-session/launch/pane/agent-launch-pane-start'
 import {
   getStructuredAgentSessionLaunchOwner,
   shouldRetainStructuredAgentSessionLaunchTab,

@@ -6,7 +6,7 @@ import type { TuiAgent } from '../../../shared/agent-launch/catalog/tui-agent'
 import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../shared/workspace-source'
 import type { LaunchSource } from '../../../shared/telemetry-events'
 import type { AgentLaunchChoice } from '@/lib/agent-menu-selection'
-import type { AgentSessionLaunchRequest } from './agent-session-launch-plan'
+import type { AgentSessionLaunchRequest } from './agent-session/launch/routing/agent-session-launch-plan'
 
 export type DirectWorkItemLaunchInputs = AgentLaunchInputViews &
   Pick<AgentSessionLaunchRequest, 'requestedSurface' | 'preferredSurface'>

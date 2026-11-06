@@ -1,4 +1,4 @@
-import { terminalLaunchOpened } from '@/lib/launch-agent-in-new-tab-host-agents'
+import { terminalLaunchOpened } from '@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab-host-agents'
 import type { TuiAgent } from '../../../../../shared/agent-launch/catalog/tui-agent'
 import type { ExecutionHostId } from '../../../../../shared/execution-host'
 import { parseExecutionHostId } from '../../../../../shared/execution-host'
@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/index'
 import {
   adoptAgentSessionLaunchVerdict,
   type AgentSessionLaunchPlan
-} from '@/lib/agent-session-launch-plan'
+} from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
 import {
   admitStructuredLaunchOnHost,
   type StructuredLaunchAdmission
@@ -23,7 +23,7 @@ import type {
   StructuredAgentLaunchSettlement
 } from '@/lib/structured-agent-launch-settlement'
 import type { StructuredPromptDeliveryResult } from '@/lib/agent-session/launch/structured-agent-session-launch-prompt'
-import type { LaunchAgentInNewTabArgs } from '@/lib/launch-agent-in-new-tab-args'
+import type { LaunchAgentInNewTabArgs } from '@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab-args'
 import type { RuntimeClientTarget } from '../../../../../shared/runtime-client-target'
 import { toRuntimeWorktreeSelector } from '@/runtime/runtime-worktree-selector'
 import { readStructuredChatHostPermissionVerdict } from '@/runtime/structured-chat-host-permission'
@@ -86,7 +86,8 @@ export async function openDeclinedStructuredLaunchTerminal(args: {
   terminal?: DeclinedStructuredLaunchTerminalOptions
 }): Promise<StructuredLaunchTerminal> {
   // Loaded late: the new-tab launcher begins these launches.
-  const { launchAgentInNewTabWithOutcome } = await import('@/lib/launch-agent-in-new-tab')
+  const { launchAgentInNewTabWithOutcome } =
+    await import('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab')
   const result = launchAgentInNewTabWithOutcome({
     ...args.terminal,
     agent: args.plan.agent,

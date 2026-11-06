@@ -5,7 +5,7 @@ import type * as launchModule from './launch/structured-agent-session-launch-cre
 import {
   type AgentSessionLaunchPlan,
   adoptAgentSessionLaunchVerdict
-} from '../agent-session-launch-plan'
+} from './launch/routing/agent-session-launch-plan'
 import { beginStructuredAgentSessionProvisionalLaunch } from './structured-agent-session-provisional-tab'
 import { StructuredAgentSessionCreateRefusalError } from './launch/structured-agent-session-launch-errors'
 import { act, renderHook } from '@testing-library/react'

@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import {
   deliverLaunchPromptToAgentTab,
   seedNativeChatLaunchDraftForAgentTab
-} from '@/lib/agent-launch-prompt-delivery'
+} from '@/lib/agent-session/launch/prompt/agent-launch-prompt-delivery'
 import {
   buildDirectWorkItemAgentStartupPlan,
   notifyDirectWorkItemAgentStartTimeout
@@ -17,9 +17,9 @@ import type { AppState } from '@/store/types'
 import { isTuiAgent } from '../../../shared/agent-launch/catalog/tui-agent-config'
 import { isTuiAgentEnabled } from '../../../shared/agent-launch/catalog/tui-agent-selection'
 import { resolveDefaultAgentForWorkspace } from './agent-tab-shortcuts'
-import { worktreeLaunchWorkspace } from '@/lib/agent-launch-route-input'
+import { worktreeLaunchWorkspace } from '@/lib/agent-session/launch/routing/agent-launch-route-input'
 import { agentChoiceMayOpenAsChat } from '@/lib/host-chat-program'
-import type { AgentSessionLaunchPlan } from '@/lib/agent-session-launch-plan'
+import type { AgentSessionLaunchPlan } from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
 import {
   resolveExecutionHostAgentStartupShell,
   type KnownExecutionHostPlatform

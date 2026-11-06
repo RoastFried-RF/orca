@@ -51,7 +51,7 @@ import {
   resetStructuredAgentLaunchPersistenceForTests,
   readStructuredAgentLaunchRecord
 } from './structured-agent-session-launch-persistence'
-import { newAgentLaunchRequestId } from '../../agent-launch-request-id'
+import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import { markStructuredAgentSessionLaunchPublished } from './structured-agent-session-launch-publication'
 import { StructuredAgentSessionCreateRefusalError } from './structured-agent-session-launch-errors'
 import { getStructuredAgentSessionReadOwner } from '@/components/native-chat/structured-agent-session-read-owner'

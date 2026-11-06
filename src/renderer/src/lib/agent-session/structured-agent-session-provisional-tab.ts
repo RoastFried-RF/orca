@@ -9,7 +9,7 @@ import type { NativeChatComposerFocusIntent } from '@/components/native-chat/use
 import type {
   AgentSessionLaunchPlan,
   AgentSessionLaunchTarget
-} from '@/lib/agent-session-launch-plan'
+} from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
 import type {
   StructuredAgentLaunchHandle,
   StructuredAgentLaunchHooks

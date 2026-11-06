@@ -16,14 +16,14 @@ import { isWslUncPath } from '../../../shared/wsl-paths'
 import type {
   AgentSessionLaunchPlan,
   planAgentSessionLaunch
-} from '@/lib/agent-session-launch-plan'
-import { adoptAgentSessionLaunchVerdict } from './agent-session-launch-plan'
+} from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
+import { adoptAgentSessionLaunchVerdict } from './agent-session/launch/routing/agent-session-launch-plan'
 import { directLaunchSurfaceRequest } from './launch-work-item-direct-preflight'
 import type {
   DirectWorkItemLaunchInputs,
   LaunchWorkItemDirectArgs
 } from './launch-work-item-direct-types'
-import type { AgentLaunchRequestId } from '@/lib/agent-launch-request-id'
+import type { AgentLaunchRequestId } from '@/lib/agent-session/launch/routing/agent-launch-request-id'
 import {
   buildDirectWorkItemStartup,
   resolveDirectWorkItemAgent

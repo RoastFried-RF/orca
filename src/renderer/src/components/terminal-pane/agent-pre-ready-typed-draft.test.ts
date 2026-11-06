@@ -102,7 +102,7 @@ vi.mock('./remote-runtime-pty-transport', () => ({
 
 vi.mock('@/lib/agent-draft-paste-content', () => ({ sendAgentDraftPasteContent }))
 
-vi.mock('@/lib/launch-agent-paste-timeout-notice', () => ({
+vi.mock('@/lib/agent-session/launch/prompt/launch-agent-paste-timeout-notice', () => ({
   createPasteReadinessTimeoutNotice: () => ({ onTimeout: onPasteTimeout, wasNotified: () => false })
 }))
 

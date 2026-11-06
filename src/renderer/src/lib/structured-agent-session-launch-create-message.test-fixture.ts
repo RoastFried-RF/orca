@@ -18,7 +18,7 @@ import { resetStructuredAgentSessionSendsForTests } from '@/components/native-ch
 import { resetStructuredAgentSessionReadOwnersForTests } from '@/components/native-chat/structured-agent-session-read-owner'
 import { resetHostModelCatalogSnapshotsForTests } from '@/runtime/host-model-catalog-snapshots'
 import { startStructuredAgentLaunch } from './agent-session/launch/structured-agent-session-launch'
-import { newAgentLaunchRequestId } from './agent-launch-request-id'
+import { newAgentLaunchRequestId } from './agent-session/launch/routing/agent-launch-request-id'
 import {
   clearNativeChatDraftCacheForTests,
   readNativeChatDraftCache

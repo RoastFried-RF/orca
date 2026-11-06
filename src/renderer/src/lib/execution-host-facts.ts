@@ -12,7 +12,7 @@ import type { AppState } from '@/store/types'
 import { getConnectionIdFromState } from './connection-owner-resolution'
 import { getLocalProjectExecutionRuntimeContext } from './local-preflight-context'
 import { CLIENT_PLATFORM } from './new-workspace'
-import type { ResolvedAgentBackgroundTarget } from './agent-background-session-contract'
+import type { ResolvedAgentBackgroundTarget } from './agent-session/launch/background/agent-background-session-contract'
 import {
   getExecutionHostIdForWorktree,
   runtimeEnvironmentIdOrLocalUnlessTwin
