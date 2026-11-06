@@ -10,21 +10,21 @@ import {
 } from '../../../../../shared/rpc-contract/structured-agent-session-params'
 import type { Tab } from '../../../../../shared/tab-types'
 import type { HostCreateSupport } from './structured-agent-session-host-admission'
-import { useAppStore } from '@/store/index'
+import { useAppStore } from '../../../store/index'
 import { registerStructuredSelectionCatalogStore } from '../options/structured-agent-session-selection-controller'
 import { resetStructuredAgentLaunchRegistryForTests } from './structured-agent-session-launch-registry'
 import { resetStructuredAgentLaunchPersistenceForTests } from './structured-agent-session-launch-persistence'
-import { resetStructuredAgentSessionSendsForTests } from '@/components/native-chat/structured-agent-session-message-sender'
-import '@/components/native-chat/structured-agent-session-read-owner'
-import { resetStructuredAgentSessionReadOwnersForTests } from '@/components/native-chat/structured-agent-session-read-owner-registry'
-import { resetHostModelCatalogSnapshotsForTests } from '@/runtime/host-model-catalog-snapshots'
+import { resetStructuredAgentSessionSendsForTests } from '../../../components/native-chat/structured-agent-session-message-sender'
+import '../../../components/native-chat/structured-agent-session-read-owner'
+import { resetStructuredAgentSessionReadOwnersForTests } from '../../../components/native-chat/structured-agent-session-read-owner-registry'
+import { resetHostModelCatalogSnapshotsForTests } from '../../../runtime/host-model-catalog-snapshots'
 import { startStructuredAgentLaunch } from './structured-agent-session-launch'
 import { newAgentLaunchRequestId } from './routing/agent-launch-request-id'
 import {
   clearNativeChatDraftCacheForTests,
   readNativeChatDraftCache
-} from '@/components/native-chat/native-chat-draft-cache'
-import { structuredAgentSessionDraftScopeKey } from '@/components/native-chat/native-chat-composer-draft-store'
+} from '../../../components/native-chat/native-chat-draft-cache'
+import { structuredAgentSessionDraftScopeKey } from '../../../components/native-chat/native-chat-composer-draft-store'
 
 type CreateMessageFixtureMocks = {
   rpc: Mock
@@ -33,7 +33,7 @@ type CreateMessageFixtureMocks = {
   call: Mock<(target: unknown, method: string, params: unknown) => Promise<unknown>>
   supports: Mock<() => Promise<boolean>>
   supportsMode: Mock<() => Promise<boolean>>
-  exactSupport: Mock<() => Promise<boolean>>
+  exactSupport: Mock<(target?: unknown, capability?: string) => Promise<boolean>>
   admit: Mock<() => Promise<HostCreateSupport>>
   inventory: Mock
   settings: Record<string, unknown>
@@ -52,7 +52,7 @@ const mocks: CreateMessageFixtureMocks = vi.hoisted(() => {
     call: vi.fn<(target: unknown, method: string, params: unknown) => Promise<unknown>>(),
     supports: vi.fn<() => Promise<boolean>>(),
     supportsMode: vi.fn<() => Promise<boolean>>(),
-    exactSupport: vi.fn<() => Promise<boolean>>(),
+    exactSupport: vi.fn<(target?: unknown, capability?: string) => Promise<boolean>>(),
     admit: vi.fn<() => Promise<HostCreateSupport>>(),
     inventory: vi.fn(),
     settings,
@@ -66,31 +66,34 @@ vi.mock('../../../../../shared/layout-owner-switch', () => ({
   }
 }))
 // This machine's host closes the chat's tab when asked.
-vi.mock('@/runtime/runtime-rpc-client', () => ({ callRuntimeRpc: mocks.rpc }))
-vi.mock('@/runtime/structured-agent-session-status-feed', () => {
+vi.mock('../../../runtime/runtime-rpc-client', () => ({ callRuntimeRpc: mocks.rpc }))
+vi.mock('../../../runtime/structured-agent-session-status-feed', () => {
   const idle = { status: 'idle', hostExecutionPhase: 'idle' }
   const working = { status: 'working', hostExecutionPhase: 'idle' }
   const feed = {
     activate: () => () => {},
     subscribe: () => () => {},
+    subscribeSession: () => () => {},
     getSnapshot: () => ({ get: () => (mocks.hostBusy ? working : idle) }),
     getSessionObservation: () => 'live'
   }
   return { getStructuredAgentSessionStatusFeed: () => feed }
 })
-vi.mock('@/runtime/structured-agent-session-client', () => ({
+vi.mock('../../../runtime/structured-agent-session-client', () => ({
   callStructuredAgentSession: mocks.call,
   supportsStructuredAgentSessionCreateOptionsMode: mocks.supportsMode,
   supportsStructuredAgentSessionCreateMessage: mocks.supports,
-  structuredAgentSessionHostSupports: mocks.exactSupport
+  structuredAgentSessionHostSupports: mocks.exactSupport,
+  structuredAgentSessionHostCapabilityState: async (target: unknown, capability: string) =>
+    (await mocks.exactSupport(target, capability)) ? 'supported' : 'unsupported'
 }))
 vi.mock('./structured-agent-session-host-admission', () => ({
   askHostCreateSupport: mocks.admit
 }))
-vi.mock('@/runtime/structured-session-tab-inventory', () => ({
+vi.mock('../../../runtime/structured-session-tab-inventory', () => ({
   readStructuredSessionTabInventory: mocks.inventory
 }))
-vi.mock('@/store/index', () => {
+vi.mock('../../../store/index', () => {
   const getState = () => ({
     runtimeEnvironmentCatalogHydrated: true,
     settings: mocks.settings,
@@ -109,7 +112,7 @@ vi.mock('@/store/index', () => {
   }
 })
 vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
-vi.mock('@/runtime/structured-chat-host-permission', () => ({
+vi.mock('../../../runtime/structured-chat-host-permission', () => ({
   readStructuredChatHostPermissionVerdict: async () => ({ kind: 'allowed' })
 }))
 

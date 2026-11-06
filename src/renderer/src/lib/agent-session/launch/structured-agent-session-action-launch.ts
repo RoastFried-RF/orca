@@ -7,7 +7,7 @@ import {
 } from './structured-agent-session-launch-registry'
 import { focusTerminalTabSurface } from '../../focus-terminal-tab-surface'
 import type { Tab } from '../../../../../shared/tab-types'
-import type { StructuredAgentLaunchSettlement } from '@/lib/agent-session/launch/continuation/structured-agent-launch-settlement'
+import type { StructuredAgentLaunchSettlement } from './continuation/structured-agent-launch-settlement'
 import type { ProvisionalLaunchArgs } from '../structured-agent-session-provisional-tab'
 import { insertUnifiedTabAfterAnchor } from '../../unified-tab-anchor-insertion'
 import { useAppStore } from '@/store/index'
@@ -52,6 +52,7 @@ export function opensAtAction(args: ProvisionalLaunchArgs): boolean {
     (args.focusIntent !== undefined &&
       args.activate !== false &&
       !plan.resumeFrom &&
+      !plan.forkFrom &&
       (!plan.prompt?.trim() || plan.promptDelivery === 'draft'))
   )
 }
