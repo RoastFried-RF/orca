@@ -1,0 +1,75 @@
+name: Windows native full unit validation
+
+on:
+  push:
+    branches:
+      - validation/windows-native-unit-suite
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: ${{ matrix.scenario }} Windows unit ${{ matrix.shard }}/8
+    runs-on: windows-2025
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [baseline, features]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      ORCA_BACKGROUND_LAUNCH: '1'
+      ORCA_PNPM_GLOBAL_VIRTUAL_STORE: '0'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.scenario == 'baseline' && 'a6c78e3de39793513a94508564673efb14c4782f' || github.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/install-node-dependencies
+        with:
+          native-runtime: node
+          node-version: '24.22.1'
+          cache-electron-package: 'true'
+
+      - name: Install Electron package binary
+        run: node config/scripts/electron-installation/platform-layout/install-electron-package-binary.mjs
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: config/.bun-version
+          no-cache: true
+
+      - name: Record source, inventory and native readiness
+        shell: bash
+        env:
+          VALIDATION_SCENARIO: ${{ matrix.scenario }}
+          VALIDATION_SHARD: ${{ matrix.shard }}
+        run: |
+          mkdir -p ci-shards/native-validation
+          node config/scripts/native-build/node-addons/ensure-native-runtime.mjs --check-only
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs'
+          import { execFileSync } from 'node:child_process'
+          import { UNIT_INCLUDE } from './config/scripts/ci/unit-selection/dependency-graph/ci-unit-files.mjs'
+          const files = [...fs.globSync(UNIT_INCLUDE, { exclude: ['**/node_modules/**', '**/.git/**'] })].map(p => p.replaceAll('\\', '/')).sort()
+          fs.writeFileSync('ci-shards/native-validation/runtime.json', JSON.stringify({ source: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), node: process.versions.node, platform: process.platform, arch: process.arch, scenario: process.env.VALIDATION_SCENARIO, shard: Number(process.env.VALIDATION_SHARD), shardCount: 8, nativeBootstrap: 'passed', inventory: files }, null, 2))
+          NODE
+          pnpm --version > ci-shards/native-validation/pnpm-version.txt
+          bun --version > ci-shards/native-validation/bun-version.txt
+
+      - name: Run complete unit inventory shard
+        shell: pwsh
+        run: |
+          pnpm test --maxWorkers=4 --shard=${{ matrix.shard }}/8 --reporter=default --reporter=json --outputFile.json=ci-shards/native-validation/unit-results.json --silent=passed-only 2>&1 | Tee-Object -FilePath ci-shards/native-validation/unit-output.log
+          exit $LASTEXITCODE
+
+      - name: Upload full unit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-unit-${{ matrix.scenario }}-${{ matrix.shard }}-attempt-${{ github.run_attempt }}
+          path: ci-shards/native-validation/
+          if-no-files-found: warn
+          retention-days: 7
