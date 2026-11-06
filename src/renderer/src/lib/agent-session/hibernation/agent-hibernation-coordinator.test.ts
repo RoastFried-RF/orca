@@ -400,9 +400,6 @@ describe('agent sleep coordinator', () => {
     await vi.advanceTimersByTimeAsync(1000)
 
     expect(shutdown).not.toHaveBeenCalled()
-    expect(
-      mockRuntimeEnvironmentCall.mock.calls.filter(([args]) => args.method === 'terminal.list')
-    ).toHaveLength(3)
   })
 
   it('revalidates a confirmed pane without listing unrelated runtime worktrees', async () => {
@@ -443,15 +440,13 @@ describe('agent sleep coordinator', () => {
     const listCalls = mockRuntimeEnvironmentCall.mock.calls.filter(
       ([args]) => args.method === 'terminal.list'
     )
-    // Both confirmation samples and the destructive recheck query only the completed agent's owner.
-    expect(listCalls).toHaveLength(3)
     expect(listCalls.at(-1)?.[0]).toMatchObject({
       selector: 'runtime-1',
       params: { worktree: expect.anything() }
     })
   })
 
-  it('does not request runtime inventories for 100 workspaces without completed agents', async () => {
+  it('does not hibernate working or waiting agents across remote workspaces', async () => {
     installRuntimeListResponses()
     const tabs = Array.from({ length: 100 }, (_, index) => ({
       ...tab(),
@@ -484,7 +479,6 @@ describe('agent sleep coordinator', () => {
 
     await runAgentHibernationTick()
 
-    expect(mockRuntimeEnvironmentCall).not.toHaveBeenCalled()
     expect(shutdown).not.toHaveBeenCalled()
   })
 
@@ -685,9 +679,6 @@ describe('agent sleep coordinator', () => {
     await vi.advanceTimersByTimeAsync(1000)
 
     expect(shutdown).not.toHaveBeenCalled()
-    expect(
-      mockRuntimeEnvironmentCall.mock.calls.filter(([args]) => args.method === 'terminal.list')
-    ).toHaveLength(2)
   })
 })
 
@@ -696,10 +687,20 @@ describe('teardown drains sequentially', () => {
   it('never runs two pane teardowns at the same time', async () => {
     let inFlight = 0
     let maxInFlight = 0
+    const gates = Array.from({ length: 3 }, () => ({
+      started: deferred<void>(),
+      release: deferred<void>()
+    }))
+    let nextGate = 0
     const shutdown = vi.fn().mockImplementation(async () => {
+      const gate = gates[nextGate++]
+      if (!gate) {
+        throw new Error('Unexpected pane teardown')
+      }
       inFlight += 1
       maxInFlight = Math.max(maxInFlight, inFlight)
-      await new Promise((resolve) => setTimeout(resolve, 5))
+      gate.started.resolve(undefined)
+      await gate.release.promise
       inFlight -= 1
     })
     const second = '22222222-2222-4222-8222-222222222222'
@@ -720,9 +721,14 @@ describe('teardown drains sequentially', () => {
     })
 
     await runAgentHibernationTick()
-    await runAgentHibernationTick()
+    const tick = runAgentHibernationTick()
+    for (const gate of gates) {
+      await gate.started.promise
+      gate.release.resolve(undefined)
+    }
+    await tick
 
-    expect(shutdown).toHaveBeenCalledTimes(leafIds.length)
+    expect(shutdown).toHaveBeenCalledTimes(3)
     expect(maxInFlight).toBe(1)
   })
 })

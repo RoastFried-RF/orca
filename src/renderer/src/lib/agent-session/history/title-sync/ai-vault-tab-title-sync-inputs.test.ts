@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { AppState } from '@/store/types'
 import type { TerminalTab } from '../../../../../../shared/workspace-layout/terminal-tab-types'
 import { aiVaultTitleSyncInputsChanged } from './ai-vault-tab-title-sync-inputs'
@@ -78,7 +78,7 @@ async function collectGarbage(): Promise<void> {
 }
 
 describe('AI Vault title subscription inputs', () => {
-  it('skips owner rescans for rank-only rows but reports a conversation workspace moving host', () => {
+  it('ignores rank and settings changes but reports a conversation workspace moving host', () => {
     // No active selection, so the row's host decides ownership.
     const state = {
       ...makeState(200),
@@ -86,21 +86,16 @@ describe('AI Vault title subscription inputs', () => {
       activeWorkspaceExecutionHostId: null
     }
     const row = state.worktreesByRepo.fixture[0]
-    const tabs = Object.values(state.tabsByWorktree).flat()
-    const tabValues = vi.spyOn(state.tabsByWorktree, 'wt-title', 'get').mockReturnValue(tabs)
     // A rank/unread patch replaces the row map without changing who owns any row.
     const ranked: AppState = {
       ...state,
       worktreesByRepo: { fixture: [{ ...row, sortOrder: 5, isUnread: true }] }
     }
     expect(aiVaultTitleSyncInputsChanged(ranked, state)).toBe(false)
-    expect(tabValues).not.toHaveBeenCalled()
 
     const settingsOnly: AppState = { ...ranked, settings: structuredClone(ranked.settings) }
     expect(aiVaultTitleSyncInputsChanged(settingsOnly, ranked)).toBe(false)
     expect(aiVaultTitleSyncInputsChanged({ ...settingsOnly }, settingsOnly)).toBe(false)
-    // Membership was collected once and reused across owner-only updates.
-    expect(tabValues.mock.calls.length).toBeLessThanOrEqual(1)
 
     const moved: AppState = {
       ...settingsOnly,

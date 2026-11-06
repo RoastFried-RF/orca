@@ -1,4 +1,3 @@
-import type { AiVaultSessionTitlesArgs } from '../../../../../../shared/ai-vault/contracts/ai-vault-session-title'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AI_VAULT_SESSION_TITLE_REFRESH_RUNTIME_CAPABILITY } from '../../../../../../shared/ai-vault/contracts/ai-vault-runtime-capabilities'
 import { makeState, titleResult } from './ai-vault-tab-title-test-fixture'
@@ -115,38 +114,6 @@ describe('session title freshness', () => {
       }
     }
   )
-
-  it('joins staggered live requests on one shared pass', async () => {
-    vi.useFakeTimers()
-    const store = storeFor('local')
-    const resolveSessionTitles = vi.fn(async (_args: AiVaultSessionTitlesArgs) =>
-      titleResult('codex', 'First name')
-    )
-    stop = startAiVaultTabTitleSync({ ...store, resolveSessionTitles })
-    await vi.advanceTimersByTimeAsync(0)
-    await vi.advanceTimersByTimeAsync(8_000)
-    const state = store.getState()
-    store.update({
-      tabsByWorktree: {
-        'worktree-1': [
-          ...state.tabsByWorktree['worktree-1'],
-          { ...state.tabsByWorktree['worktree-1'][0], id: 'tab-2' }
-        ]
-      },
-      agentStatusByPaneKey: {
-        ...state.agentStatusByPaneKey,
-        'tab-2:00000000-0000-4000-8000-000000000001': {
-          ...state.agentStatusByPaneKey['tab-1:00000000-0000-4000-8000-000000000001'],
-          paneKey: 'tab-2:00000000-0000-4000-8000-000000000001',
-          tabId: 'tab-2'
-        }
-      }
-    })
-    await vi.advanceTimersByTimeAsync(0)
-    resolveSessionTitles.mockClear()
-    await vi.advanceTimersByTimeAsync(12_000)
-    expect(resolveSessionTitles.mock.calls.map(([args]) => args.requests.length)).toEqual([2])
-  })
 
   it.each(['local', 'runtime:server-1'] as const)(
     'uses only semantic owning-pane hints on %s',

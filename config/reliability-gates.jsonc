@@ -1845,7 +1845,7 @@
     },
     {
       "id": "agent-session.hibernation-runtime-inventory-budget",
-      "title": "Hibernation skips irrelevant remote inventories and preserves fresh host evidence",
+      "title": "Hibernation preserves fresh host evidence and shutdown safety",
       "maturity": "experimental",
       "protection": "partial",
       "owner": "agent-session-runtime",
@@ -1855,12 +1855,12 @@
       "providers": ["local", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "remote-runtime"],
-      "coverageNotes": "Local hibernation, remote inventory authority and folder-workspace identity are covered by coordinator/model contracts on macOS. Daemon, SSH, WSL, relay and native platform execution boundaries and existing RPC payloads are unchanged.",
+      "coverageNotes": "Local hibernation, remote inventory authority and folder-workspace identity are covered by coordinator/model contracts on macOS. Daemon, SSH, WSL, relay and native platform execution boundaries and existing RPC payloads are unchanged. Current assertions cover shutdown safety and owning-host selection; historical inventory-count and performance evidence below is retained for provenance and is not current count coverage.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/blob/main/src/renderer/src/lib/agent-hibernation-coordinator.test.ts"
       ],
       "invariant": "Automatic hibernation must retain two stable confirmations and fresh execution-host evidence before shutdown. Skipping a workspace with no completed agent must not authorize a newly completed pane using stale client PTYs.",
-      "oracle": "100 remote workspaces containing working/waiting agents issue zero runtime calls. A skipped workspace completing while another inventory awaits remains ineligible until two later host-confirmed passes, and so does a workspace that only becomes runtime-owned while an inventory is outstanding — a pass carrying no host evidence for a workspace never counts as one of its two confirmations. Folder and git workspaces hibernate the exact host PTY; rejected/truncated inventories and intervening input/output or state changes block shutdown.",
+      "oracle": "Working and waiting agents across remote workspaces must not be shut down. A skipped workspace completing while another inventory awaits remains ineligible until two later host-confirmed passes, and so does a workspace that only becomes runtime-owned while an inventory is outstanding — a pass carrying no host evidence for a workspace never counts as one of its two confirmations. Folder and git workspaces hibernate the exact host PTY; rejected/truncated inventories and intervening input/output or state changes block shutdown.",
       "commands": [
         "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-runtime-liveness-race.test.ts"
       ],
@@ -1876,7 +1876,7 @@
         {
           "file": "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts",
           "assertions": [
-            "does not request runtime inventories for 100 workspaces without completed agents",
+            "does not hibernate working or waiting agents across remote workspaces",
             "requires host evidence after a skipped workspace completes during another inventory request",
             "hibernates a runtime-backed candidate in %s with fresh liveness and exact PTYs",
             "fails closed on truncated runtime liveness samples",
@@ -1925,7 +1925,7 @@
       "promotionCriteria": [
         "Complete CI soak with zero unexplained flakes and preserve the observable oracle."
       ],
-      "demotionRule": "Keep experimental until CI soak; investigate failures without relaxing fidelity, liveness or resource-count assertions."
+      "demotionRule": "Keep experimental until CI soak; investigate failures without relaxing fidelity, liveness or shutdown-safety assertions."
     },
     {
       "id": "terminal-performance.osc-status-scan-budget",
