@@ -1,0 +1,96 @@
+name: Windows full unit prerequisite recheck
+
+on:
+  push:
+    branches:
+      - validation/windows-native-prerequisite-recheck
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    name: ${{ matrix.scenario }} Windows prerequisite recheck
+    runs-on: windows-2025
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [baseline, features]
+    env:
+      ORCA_BACKGROUND_LAUNCH: '1'
+      ORCA_PNPM_GLOBAL_VIRTUAL_STORE: '0'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.scenario == 'baseline' && 'a6c78e3de39793513a94508564673efb14c4782f' || 'a32fecafae7b624ab9d2a390d2a312bbf9e78ef8' }}
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - uses: ./.github/actions/install-node-dependencies
+        with:
+          native-runtime: node
+          node-version: '24.22.1'
+          cache-electron-package: 'true'
+
+      - name: Install Electron package binary
+        run: node config/scripts/electron-installation/platform-layout/install-electron-package-binary.mjs
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: config/.bun-version
+          no-cache: true
+
+      # Tests replace HOME; keep rustup and Cargo anchored to the disposable runner.
+      - name: Prepare Windows Rust executables before isolated test homes
+        shell: pwsh
+        run: |
+          $env:RUSTUP_HOME = Join-Path $env:USERPROFILE '.rustup'
+          $env:CARGO_HOME = Join-Path $env:USERPROFILE '.cargo'
+          $env:RUSTUP_TOOLCHAIN = 'stable'
+          "RUSTUP_HOME=$env:RUSTUP_HOME" >> $env:GITHUB_ENV
+          "CARGO_HOME=$env:CARGO_HOME" >> $env:GITHUB_ENV
+          "RUSTUP_TOOLCHAIN=$env:RUSTUP_TOOLCHAIN" >> $env:GITHUB_ENV
+          cargo --version
+          if ($LASTEXITCODE -ne 0) { throw 'The runner Rust toolchain is unavailable' }
+          node config/scripts/native-build/windows/build-windows-agent-hook.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node config/scripts/native-build/windows/build-windows-cli-launcher.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Record unchanged source and native readiness
+        shell: bash
+        env:
+          VALIDATION_SCENARIO: ${{ matrix.scenario }}
+        run: |
+          mkdir -p ci-shards/native-validation
+          node config/scripts/native-build/node-addons/ensure-native-runtime.mjs --check-only
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs'
+          import { execFileSync } from 'node:child_process'
+          const source = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+          fs.writeFileSync('ci-shards/native-validation/runtime.json', JSON.stringify({ source, node: process.versions.node, platform: process.platform, arch: process.arch, scenario: process.env.VALIDATION_SCENARIO, nativeBootstrap: 'passed', fullHistory: true, prebuiltWindowsRustExecutables: true }, null, 2))
+          NODE
+
+      - name: Recheck history-dependent and Windows native hook tests
+        shell: pwsh
+        run: |
+          $files = @(
+            'tests/e2e/cross-version-wire/',
+            'src/main/agent-hooks/windows-native-hook-exe-hosts.test.ts',
+            'src/main/agent-hooks/windows-hook-payload-delivery.test.ts',
+            'src/main/agent-hooks/managed-hook-stdin-lifecycle.test.ts',
+            'src/main/claude/windows-native-hook-registration.test.ts'
+          )
+          pnpm test --maxWorkers=2 @files --reporter=default --reporter=json --outputFile.json=ci-shards/native-validation/unit-results.json --silent=passed-only 2>&1 | Tee-Object -FilePath ci-shards/native-validation/unit-output.log
+          exit $LASTEXITCODE
+
+      - name: Upload prerequisite recheck evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-prerequisite-${{ matrix.scenario }}-attempt-${{ github.run_attempt }}
+          path: ci-shards/native-validation/
+          if-no-files-found: warn
+          retention-days: 7
