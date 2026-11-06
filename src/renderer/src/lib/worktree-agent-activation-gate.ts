@@ -8,11 +8,10 @@ import { parsePaneKey } from '../../../shared/workspace-layout/stable-pane-id'
 import { parseWorkspaceKey } from '../../../shared/workspace-scope'
 import { worktreeIdsEqual } from '../../../shared/worktree/id'
 import { listActivationPtySessions } from './worktree-activation-pty-inventory'
-import {
-  resumeSleepingAgentSessionsForWorktree,
-  type ResumeSleepingAgentSessionsOptions
-} from './resume-sleeping-agent-session'
-import { getProviderSessionClaimKey } from './sleeping-agent-pane-ownership'
+import { resumeSleepingAgentSessionsForWorktree } from './agent-session/resume/resume-sleeping-agent-session'
+import type { ResumeSleepingAgentSessionsOptions } from './agent-session/resume/sleeping-agent-session-launch'
+import './agent-session/resume/sleeping-agent-pane-ownership'
+import { getProviderSessionClaimKey } from '../../../shared/sleeping-record-legacy-pane-key'
 import {
   adoptLiveWorkspacePtySurfaces,
   type LiveSurfaceAdoptionStore
@@ -22,7 +21,7 @@ import {
   type LiveTerminalSurfaceOwnerIndex,
   readWorktreeLiveTerminalSurfaceOwners
 } from './worktree-live-terminal-surface-owners'
-import { isStructuredAgentSyntheticSleepingRecord } from './structured-agent-synthetic-sleeping-record'
+import { isStructuredAgentSyntheticSleepingRecord } from './agent-session/resume/structured-agent-synthetic-sleeping-record'
 import {
   readWorktreeStructuredActivationInventory,
   type StructuredActivationInventory

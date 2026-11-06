@@ -16,7 +16,7 @@ import {
 import {
   agentResumeOriginNamesAnotherExecutionHost,
   sleepingRecordNamesAnotherExecutionHost
-} from '@/lib/sleeping-record-execution-host-scope'
+} from '@/lib/agent-session/resume/sleeping-record-execution-host-scope'
 import { resolveResumeLaunchRecipe } from '../../../../../shared/agent-launch/choices/tui-agent-launch-defaults'
 import {
   agentProviderSessionsEqual,

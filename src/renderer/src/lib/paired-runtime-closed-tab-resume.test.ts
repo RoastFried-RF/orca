@@ -16,7 +16,7 @@ import type { Worktree } from '../../../shared/worktree/types'
 import { makePaneKey } from '../../../shared/workspace-layout/stable-pane-id'
 import { toWebTerminalSurfaceTabId } from '../../../shared/workspace-layout/terminal-surface-id'
 import { makeCreatedAgentWorktree } from './worktree-activation-created-agent.test-fixture'
-import { resumeSleepingAgentSessionsForWorktree } from './resume-sleeping-agent-session'
+import { resumeSleepingAgentSessionsForWorktree } from './agent-session/resume/resume-sleeping-agent-session'
 
 // Paired clients cannot distinguish another client’s close from rekey/pending handles; local records must never authorize another host writer (#21235).
 

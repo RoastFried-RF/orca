@@ -6,7 +6,7 @@ import {
   collectAgentPaneConversations,
   resolvePaneAgentConversation,
   resolvePaneLastAgentConversation
-} from '@/lib/ai-vault-tab-title-requests'
+} from '@/lib/agent-session/history/title-sync/ai-vault-tab-title-requests'
 import {
   isAiVaultSessionResumableContent,
   type AiVaultListArgs,
@@ -38,7 +38,7 @@ import {
 } from '../right-sidebar/ai-vault/scanning/ai-vault-session-list-request'
 import { resolveAiVaultPanelSessionListRequest } from '../right-sidebar/ai-vault/scanning/ai-vault-panel-session-list-request'
 import { resolveAiVaultHostScopeDefaults } from '../right-sidebar/ai-vault/scope/ai-vault-host-scope'
-import { getAiVaultResumeWorkspaceExecutionHostId } from '@/lib/ai-vault-resume-target'
+import { getAiVaultResumeWorkspaceExecutionHostId } from '@/lib/agent-session/resume/history/ai-vault-resume-target'
 import '../right-sidebar/ai-vault/scanning/ai-vault-session-refresh'
 import { claimAiVaultForcedRescan } from '../right-sidebar/ai-vault/scanning/ai-vault-forced-rescan-budget'
 import { structuredAgentSessionLaunchFeasible } from '@/lib/agent-session/launch/routing/agent-session-launch-plan'

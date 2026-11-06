@@ -25,7 +25,7 @@ vi.mock('sonner', () => ({ toast: { info: mocks.toastInfo, error: mocks.toastErr
 vi.mock('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab', () => ({
   launchAgentInNewTabWithOutcome: mocks.launchAgentInNewTab
 }))
-vi.mock('@/lib/ai-vault-session-resume-preparation', () => ({
+vi.mock('@/lib/agent-session/resume/history/ai-vault-session-resume-preparation', () => ({
   prepareAiVaultSessionForResume: async () => ({ sessionId: 'provider-1' })
 }))
 vi.mock('@/runtime/structured-agent-session-client', () => ({

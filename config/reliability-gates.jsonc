@@ -1862,19 +1862,19 @@
       "invariant": "Automatic hibernation must retain two stable confirmations and fresh execution-host evidence before shutdown. Skipping a workspace with no completed agent must not authorize a newly completed pane using stale client PTYs.",
       "oracle": "100 remote workspaces containing working/waiting agents issue zero runtime calls. A skipped workspace completing while another inventory awaits remains ineligible until two later host-confirmed passes, and so does a workspace that only becomes runtime-owned while an inventory is outstanding — a pass carrying no host evidence for a workspace never counts as one of its two confirmations. Folder and git workspaces hibernate the exact host PTY; rejected/truncated inventories and intervening input/output or state changes block shutdown.",
       "commands": [
-        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-hibernation-runtime-liveness-race.test.ts"
+        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-runtime-liveness-race.test.ts"
       ],
       "testFiles": [
-        "src/renderer/src/lib/agent-hibernation-coordinator.test.ts",
-        "src/renderer/src/lib/agent-hibernation-planner.test.ts",
-        "src/renderer/src/lib/agent-hibernation-pane-age.test.ts",
-        "src/renderer/src/lib/agent-hibernation-visibility.test.ts",
+        "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts",
+        "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-planner.test.ts",
+        "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-pane-age.test.ts",
+        "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-visibility.test.ts",
         "src/renderer/src/lib/foreground-terminal-tabs.test.ts",
-        "src/renderer/src/lib/agent-hibernation-runtime-liveness-race.test.ts"
+        "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-runtime-liveness-race.test.ts"
       ],
       "assertionRefs": [
         {
-          "file": "src/renderer/src/lib/agent-hibernation-coordinator.test.ts",
+          "file": "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts",
           "assertions": [
             "does not request runtime inventories for 100 workspaces without completed agents",
             "requires host evidence after a skipped workspace completes during another inventory request",
@@ -1884,7 +1884,7 @@
           ]
         },
         {
-          "file": "src/renderer/src/lib/agent-hibernation-runtime-liveness-race.test.ts",
+          "file": "src/renderer/src/lib/agent-session/hibernation/agent-hibernation-runtime-liveness-race.test.ts",
           "assertions": [
             "requires host evidence when a workspace becomes runtime-owned during an inventory request"
           ]
@@ -1896,7 +1896,7 @@
           "runner": "local",
           "platform": "macos",
           "command": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-hibernation-confirmation.test.ts src/renderer/src/lib/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-hibernation-output-activity.test.ts src/renderer/src/lib/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-hibernation-runtime-liveness-race.test.ts",
-          "currentCommand": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-hibernation-runtime-liveness-race.test.ts",
+          "currentCommand": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/renderer/src/lib/agent-session/hibernation/agent-hibernation-coordinator.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-planner.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-pane-age.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-visibility.test.ts src/renderer/src/lib/foreground-terminal-tabs.test.ts src/renderer/src/lib/agent-session/hibernation/agent-hibernation-runtime-liveness-race.test.ts",
           "result": "passed",
           "durationSeconds": 48.18,
           "summary": "93 tests passed across eight coordinator, liveness-race, planner, confirmation, age, activity and visibility files."
@@ -8294,14 +8294,14 @@
       "invariant": "Workspace activation, launch, restore, sleep, hibernate, dedupe, clearing, mount, remount, and reconnect code must not replay or resume a provider session id already owned, queued, pending, live, or durably bound to a host PTY in that workspace. A renderer with missing projection state must adopt the exact runtime-owned PTY for the original tab and leaf rather than create a replacement.",
       "oracle": "Retained exact unchanged-source receipts remain the only current execution evidence. Reduced selectors have no fresh execution result. Historical pre-audit oracle account for changed sources: Existing exact unchanged-selector receipts remain the only current execution evidence. Changed source selectors have no fresh execution result. Historical prior-source oracle account: Renderer-state tests assert provider-session ownership across preserved and queued panes. Main/provider contracts assert atomic attach-only adoption, stable host/worktree/tab/leaf identity, no fresh spawn on adoption, and safe paired-runtime cancellation. The Electron oracle creates inactive runtime-owned Codex and Setup PTYs plus an unrelated canary, seeds an exact resumable provider session, removes only the target renderer projections, and activates the workspace. It requires byte-stable handle, PTY, incarnation, tab, leaf, process PID, renderer graph, persisted binding, runtime id, graph epoch, and daemon PID across first mount and reload; PID-specific DOM keyboard I/O must remain live with one launch, zero resume argv, zero signals, zero interruption text, and no canary mutation.",
       "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/resume-sleeping-agent-session.test.ts",
+        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/agent-session/resume/resume-sleeping-agent-session.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/completed-worker-retirement-resume.unit.test.ts --reporter=verbose",
-        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/resume-sleeping-agent-session.test.ts src/main/providers/local-pty/local-pty-provider-spawn-session.test.ts src/main/daemon/terminal-host/testing/terminal-host.test.ts src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts src/main/ipc/pty/pty-pane-reservation-settlement.test.ts src/main/runtime/orca-runtime.test.ts src/renderer/src/lib/pane-manager/pane-fit.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-replay.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-host-session-launch.test.ts",
+        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/agent-session/resume/resume-sleeping-agent-session.test.ts src/main/providers/local-pty/local-pty-provider-spawn-session.test.ts src/main/daemon/terminal-host/testing/terminal-host.test.ts src/main/daemon/providers/adapter/testing/daemon-pty-adapter.test.ts src/main/ipc/pty/pty-pane-reservation-settlement.test.ts src/main/runtime/orca-runtime.test.ts src/renderer/src/lib/pane-manager/pane-fit.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-replay.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-host-session-launch.test.ts",
         "pnpm exec electron-vite build --mode e2e && SKIP_BUILD=1 pnpm exec playwright test tests/e2e/live-background-terminal-mount-authority.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/agent-session/lifecycle/structured-agent-cli-writers.test.ts src/main/runtime/rpc/methods/structured-sessions/creation/structured-agent-session-adoption-replay.test.ts src/main/providers/agent-foreground-process-git-bash.win32.test.ts"
       ],
       "testFiles": [
-        "src/renderer/src/lib/resume-sleeping-agent-session.test.ts",
+        "src/renderer/src/lib/agent-session/resume/resume-sleeping-agent-session.test.ts",
         "tests/e2e/completed-worker-retirement-resume.unit.test.ts",
         "src/main/providers/local-pty/local-pty-provider-spawn-session.test.ts",
         "src/main/daemon/terminal-host/testing/terminal-host.test.ts",
@@ -8340,7 +8340,7 @@
           ]
         },
         {
-          "file": "src/renderer/src/lib/resume-sleeping-agent-session.test.ts",
+          "file": "src/renderer/src/lib/agent-session/resume/resume-sleeping-agent-session.test.ts",
           "assertions": [
             "preserved panes claim their provider session and only stale duplicates are cleared",
             "one launch per provider session: skipped duplicates are cleared instead of relaunched",
@@ -8385,7 +8385,8 @@
           "command": "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/resume-sleeping-agent-session.test.ts",
           "result": "passed",
           "durationSeconds": 1.9,
-          "summary": "1 test file(s) passed, 30 tests passed on main@1282f5c2d in a clean checkout."
+          "summary": "1 test file(s) passed, 30 tests passed on main@1282f5c2d in a clean checkout.",
+          "currentCommand": "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/agent-session/resume/resume-sleeping-agent-session.test.ts"
         }
       ],
       "runtimeBudget": {

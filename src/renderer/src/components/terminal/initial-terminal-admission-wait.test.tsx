@@ -31,7 +31,7 @@ vi.mock('@/store', async () => {
   }
 })
 vi.mock('@/lib/worktree-agent-activation-gate', () => ({ gateWorktreeAgentActivation: mocks.gate }))
-vi.mock('@/lib/resume-sleeping-agent-session', () => ({
+vi.mock('@/lib/agent-session/resume/resume-sleeping-agent-session', () => ({
   resumeSleepingAgentSessionsForWorktree: vi.fn()
 }))
 vi.mock('@/lib/workspace-terminal-host-authority', () => ({

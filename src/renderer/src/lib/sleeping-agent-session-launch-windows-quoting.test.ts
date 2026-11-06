@@ -99,7 +99,8 @@ const record: SleepingAgentSessionRecord = {
 }
 
 async function launch(sessionRecord = record): Promise<string | undefined> {
-  const { launchSleepingAgentSession } = await import('./sleeping-agent-session-launch')
+  const { launchSleepingAgentSession } =
+    await import('./agent-session/resume/sleeping-agent-session-launch')
   launchSleepingAgentSession(sessionRecord)
   const options = mockCreateTab.mock.calls.at(-1)?.[3] as
     | { pendingStartup?: { command: string } }

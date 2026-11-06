@@ -45,7 +45,7 @@ vi.mock('@/lib/agent-session/launch/structured-agent-session-launch-status', () 
   hasStructuredAgentLaunchInWorktree: (worktreeId: string) =>
     ['claude', 'codex', 'grok'].some((agent) => mocks.launchStatus(worktreeId, agent) !== 'idle')
 }))
-vi.mock('@/lib/resume-sleeping-agent-session', () => ({
+vi.mock('@/lib/agent-session/resume/resume-sleeping-agent-session', () => ({
   resumeSleepingAgentSessionsForWorktree: mocks.resume
 }))
 vi.mock('@/lib/workspace-terminal-host-authority', () => ({

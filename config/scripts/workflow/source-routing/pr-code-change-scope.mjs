@@ -297,7 +297,6 @@ const CROSS_VERSION_WIRE_PREFIXES = [
   'src/shared/electron-remote-runtime-client-capabilities.ts',
   'src/shared/remote-runtime/remote-runtime-client-capabilities.ts',
   // An older app opening a newer orchestration database (orchestration-delivery-downgrade).
-  'src/main/runtime/orchestration/db.ts',
   'src/main/runtime/orchestration/db/',
   'src/main/runtime/orchestration/db/schema/orchestration-schema-version-skew'
 ]

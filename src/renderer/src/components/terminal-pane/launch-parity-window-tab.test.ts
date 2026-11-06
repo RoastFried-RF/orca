@@ -79,7 +79,7 @@ const load = perClientLoader(async () => ({
   launch: await import('@/lib/agent-session/launch/new-tab/launch-agent-in-new-tab'),
   quick: await import('@/lib/run-quick-command-in-new-tab'),
   vault: await import('@/lib/launch-ai-vault-session'),
-  resume: await import('@/lib/ai-vault-resume-command'),
+  resume: await import('@/lib/agent-session/resume/history/ai-vault-resume-command'),
   pane: await import('./pty-connection'),
   paneOptions: await import('./terminal-pane-manager-options'),
   defaults: await import('@/lib/pane-manager/pane-terminal-options'),

@@ -12,7 +12,7 @@ import {
   type CliConversationRowAgent
 } from '../../../../../../shared/structured-agent-cli-conversation-adoption'
 import { hasRuntimeRpcErrorCode } from '../../../../../../shared/runtime-rpc-error-code'
-import { prepareAiVaultSessionForResume } from '@/lib/ai-vault-session-resume-preparation'
+import { prepareAiVaultSessionForResume } from '@/lib/agent-session/resume/history/ai-vault-session-resume-preparation'
 import { adoptAgentSessionLaunchVerdict } from '@/lib/agent-session/launch/routing/agent-session-launch-plan'
 import type { AgentLaunchRequestId } from '@/lib/agent-session/launch/routing/agent-launch-request-id'
 import { activateAndRevealWorkspace } from '@/lib/worktree-activation'

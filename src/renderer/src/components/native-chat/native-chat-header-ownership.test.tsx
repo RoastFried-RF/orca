@@ -40,7 +40,7 @@ vi.mock('@/lib/native-chat-cli-fork-preparation', () => ({
 vi.mock('@/lib/launch-ai-vault-session-and-reveal', () => ({
   launchAiVaultSessionAndReveal: mocks.launch
 }))
-vi.mock('@/lib/ai-vault-session-fork-startup', () => ({
+vi.mock('@/lib/agent-session/resume/history/ai-vault-session-fork-startup', () => ({
   assertAiVaultCopiedSessionLaunchAllowed: () => {},
   buildAiVaultForkStartupForWorktree: () => ({ command: 'fixture-fork' })
 }))
