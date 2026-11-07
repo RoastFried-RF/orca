@@ -88,6 +88,13 @@ edit(
   'void run().catch((error: unknown) => {\n  writeStatus(String(error))',
   "void run().catch((error: unknown) => {\n  writeStatus(JSON.stringify({ phase, error: require('node:util').inspect(error, { depth: 8 }), stack: error instanceof Error ? error.stack : undefined }))"
 )
+if (remainingTwo) {
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-cdp-fixture.ts',
+    'afterAll(async () => {\n  cdpConnected.resolve()',
+    'afterAll(async () => {\n  const diagnosticDir = process.env.ORCA_DIAG_POPUP_STATUS_DIR\n  if (diagnosticDir && existsSync(statusPath)) {\n    mkdirSync(diagnosticDir, { recursive: true })\n    writeFileSync(join(diagnosticDir, "status.json"), JSON.stringify({ status: status(), receipts, snapshots }, null, 2))\n  }\n  cdpConnected.resolve()'
+  )
+}
 const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const pattern = targets
   .filter((t) => t.id !== 9)
@@ -102,9 +109,7 @@ function run(label, args) {
   const env = {
     ...process.env,
     ORCA_DIFFERENTIAL_EVENTS: path.join(output, `${label}-events.jsonl`),
-    ...(remainingTwo
-      ? { ORCA_POPUP_FIXTURE_ARTIFACT_DIR: path.join(output, `${label}-electron`) }
-      : {})
+    ...(remainingTwo ? { ORCA_DIAG_POPUP_STATUS_DIR: path.join(output, `${label}-electron`) } : {})
   }
   const argv = [
     'test',
