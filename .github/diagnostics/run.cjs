@@ -44,6 +44,14 @@ if (applyFix) {
               'src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts'
             )
           )
+          .digest('hex'),
+        nativeSha256: require('node:crypto')
+          .createHash('sha256')
+          .update(
+            fs.readFileSync(
+              'src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts'
+            )
+          )
           .digest('hex')
       },
       null,
@@ -256,6 +264,68 @@ if (applyFix) {
   }
   run('changed-check', ['--base=HEAD', '--maxWorkers=2', '--timeout=10'], 'check:changed')
 }
+if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
+  const testFile =
+    'src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts'
+  const productFile = 'src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts'
+  const fixtureFile =
+    'src/main/browser/guest-lifecycle/popups/browser-popup-native-electron-fixture.ts'
+  const sources = new Map(
+    [testFile, productFile, fixtureFile].map((file) => [file, fs.readFileSync(file, 'utf8')])
+  )
+  try {
+    fs.writeFileSync(
+      fixtureFile,
+      sources.get(fixtureFile).replace(
+        'contentSize: window.isDestroyed() ? [] : window.getContentSize()',
+        `menuVisible: !window.isDestroyed() && window.isMenuBarVisible(),
+        autoHideMenu: !window.isDestroyed() && window.isMenuBarAutoHide(),
+        minimumSize: window.isDestroyed() ? [] : window.getMinimumSize(),
+        windowSize: window.isDestroyed() ? [] : window.getSize(),
+        contentSize: window.isDestroyed() ? [] : window.getContentSize()`
+      )
+    )
+    fs.writeFileSync(
+      testFile,
+      sources
+        .get(testFile)
+        .replace(
+          "import { mkdirSync } from 'node:fs'",
+          "import { mkdirSync, writeFileSync } from 'node:fs'"
+        )
+        .replace(
+          "await child.evaluate('window.resizeTo(100, 100)')",
+          `await child.evaluate('window.resizeTo(100, 100)')
+      await refreshStatus()
+      const evidenceDir = process.env.ORCA_DIAG_POPUP_STATUS_DIR!
+      mkdirSync(evidenceDir, { recursive: true })
+      writeFileSync(join(evidenceDir, 'minimum.json'), JSON.stringify({native: status().native.windows.at(-1), page: await child.evaluate(() => ({innerWidth, innerHeight, outerWidth, outerHeight, devicePixelRatio}))}, null, 2))
+      try {
+        await child.screenshot({path: join(evidenceDir, 'minimum.png'), timeout: 5000, animations: 'disabled'})
+      } catch (error) {
+        writeFileSync(join(evidenceDir, 'capture-error.txt'), String(error))
+      }`
+        )
+    )
+    const args = [testFile, '-t', 'keeps native popups at the origin-safe minimum size: script']
+    fs.writeFileSync(
+      productFile,
+      sources
+        .get(productFile)
+        .replace(
+          '      // Match origin-bar popups: a visible app menu consumes the minimum content height.\n      autoHideMenuBar: true,\n',
+          ''
+        )
+    )
+    run('native-before', args)
+    fs.writeFileSync(productFile, sources.get(productFile))
+    run('native-after', args)
+  } finally {
+    for (const [file, source] of sources) {
+      fs.writeFileSync(file, source)
+    }
+  }
+}
 const summaries = []
 for (const run of runs) {
   const filename = path.join(output, `${run.label}-results.json`)
@@ -292,6 +362,9 @@ console.log(
     }))
   )
 )
-if (applyFix && runs.some((run) => run.exit !== 0)) {
+if (
+  applyFix &&
+  runs.some((run) => (run.label === 'native-before' ? run.exit !== 1 : run.exit !== 0))
+) {
   process.exitCode = 1
 }

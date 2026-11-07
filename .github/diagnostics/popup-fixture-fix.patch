@@ -57,7 +57,7 @@ index 6dc3ab32..27400400 100644
        })().catch(reject)
      })
 diff --git a/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts b/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
-index 2c86126b..d00c0430 100644
+index 2c86126b..64f1e534 100644
 --- a/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
 +++ b/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
 @@ -15,7 +15,6 @@ import {
@@ -80,7 +80,7 @@ index 2c86126b..d00c0430 100644
 -          await refreshStatus()
 -          const width = status().native.windows.at(-1)?.contentSize[0]
 -          return Math.abs((width ?? Infinity) - 640)
-+          const width = await child.evaluate('window.outerWidth')
++          const width = await child.evaluate(() => window.outerWidth)
 +          return Math.abs(width - 640)
          })
          .toBeLessThanOrEqual(1)
@@ -94,3 +94,25 @@ index 2c86126b..d00c0430 100644
        await closeChildren(page)
        await page.locator('#shift').evaluate((link) => link.setAttribute('href', '/shift'))
      }
+diff --git a/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts b/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
+index c4d6e1fd..8af6a197 100644
+--- a/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
++++ b/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
+@@ -28,7 +28,7 @@ export function isNativeBrowserPopupRequest(input: {
+   )
+ }
+ 
+-// OpenURL creates synchronously; scripted window.open creates its child in a later task.
++/** Preserves pre-navigation admission across synchronous links and deferred script windows. */
+ export function allowNativeBrowserPopup(input: {
+   opener: WebContents
+   options: Electron.BrowserWindowConstructorOptions
+@@ -97,6 +97,8 @@ export function allowNativeBrowserPopup(input: {
+       ...input.options,
+       title: 'about:blank',
+       fullscreenable: false,
++      // Match origin-bar popups: a visible app menu consumes the minimum content height.
++      autoHideMenuBar: true,
+       show: mayPresent && !input.background,
+       // Content-sized like origin-bar popups, so resizeTo cannot hide the origin title.
+       useContentSize: true,
