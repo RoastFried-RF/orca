@@ -1,9 +1,11 @@
 name: Windows differential diagnosis of 14 unmatched failures
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - validation/windows-differential-14
+      - validation/windows-native-fixed-unit-suite
 
 permissions:
   contents: read
