@@ -5,6 +5,7 @@ const { spawnSync } = require('node:child_process')
 const targets = require('./targets.json')
 const remainingTwo = process.env.ORCA_DIAG_REMAINING_TWO === '1'
 const applyFix = process.env.ORCA_DIAG_APPLY_POPUP_FIX === '1'
+const captureOnly = process.env.ORCA_DIAG_CAPTURE_ONLY === '1'
 const output = path.resolve('ci-shards/differential')
 fs.mkdirSync(output, { recursive: true })
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
@@ -236,14 +237,14 @@ function run(label, args, command = 'test') {
   console.log(`Finished ${label}: ${child.status}, ${Date.now() - started}ms`)
 }
 // Run exact cases twice, then preserve clone predecessor ordering in a separate invocation.
-if (remainingTwo) {
+if (remainingTwo && !captureOnly) {
   for (let round = 1; round <= 3; round++) {
     run(
       `remaining-two-${round}`,
       targets.filter((t) => t.id === 9).map((t) => t.file)
     )
   }
-} else {
+} else if (!captureOnly) {
   for (let round = 1; round <= 2; round++) {
     run(`selected-${round}`, [...files, '-t', pattern])
   }
@@ -253,7 +254,7 @@ if (remainingTwo) {
     'clone|clones|cloning|submodule cache'
   ])
 }
-if (applyFix) {
+if (applyFix && !captureOnly) {
   run('related-popups', [
     'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility.electron.test.ts',
     'src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts',
@@ -263,6 +264,16 @@ if (applyFix) {
     fs.writeFileSync(file, source)
   }
   run('changed-check', ['--base=HEAD', '--maxWorkers=2', '--timeout=10'], 'check:changed')
+}
+if (captureOnly) {
+  for (const [file, source] of originalFiles) {
+    fs.writeFileSync(file, source)
+  }
+  run(
+    'documentation-changed-check',
+    ['--base=HEAD', '--maxWorkers=2', '--timeout=10'],
+    'check:changed'
+  )
 }
 if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
   const testFile =
@@ -276,14 +287,21 @@ if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
   try {
     fs.writeFileSync(
       fixtureFile,
-      sources.get(fixtureFile).replace(
-        'contentSize: window.isDestroyed() ? [] : window.getContentSize()',
-        `menuVisible: !window.isDestroyed() && window.isMenuBarVisible(),
+      sources
+        .get(fixtureFile)
+        .replace(
+          'this.windows.push(window)',
+          'window.webContents.setBackgroundThrottling(false)\n      this.windows.push(window)'
+        )
+        .replace(
+          'contentSize: window.isDestroyed() ? [] : window.getContentSize()',
+          `visible: !window.isDestroyed() && window.isVisible(),
+        menuVisible: !window.isDestroyed() && window.isMenuBarVisible(),
         autoHideMenu: !window.isDestroyed() && window.isMenuBarAutoHide(),
         minimumSize: window.isDestroyed() ? [] : window.getMinimumSize(),
         windowSize: window.isDestroyed() ? [] : window.getSize(),
         contentSize: window.isDestroyed() ? [] : window.getContentSize()`
-      )
+        )
     )
     fs.writeFileSync(
       testFile,
@@ -299,7 +317,7 @@ if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
       await refreshStatus()
       const evidenceDir = process.env.ORCA_DIAG_POPUP_STATUS_DIR!
       mkdirSync(evidenceDir, { recursive: true })
-      writeFileSync(join(evidenceDir, 'minimum.json'), JSON.stringify({native: status().native.windows.at(-1), page: await child.evaluate(() => ({innerWidth, innerHeight, outerWidth, outerHeight, devicePixelRatio}))}, null, 2))
+      writeFileSync(join(evidenceDir, 'minimum.json'), JSON.stringify({native: status().native.windows.at(-1), windowsHidden: status().windowsHidden, presentationCalls: status().native.presentationCalls, rendererBackgroundThrottling: false, page: await child.evaluate(() => ({innerWidth, innerHeight, outerWidth, outerHeight, devicePixelRatio}))}, null, 2))
       try {
         await child.screenshot({path: join(evidenceDir, 'minimum.png'), timeout: 5000, animations: 'disabled'})
       } catch (error) {

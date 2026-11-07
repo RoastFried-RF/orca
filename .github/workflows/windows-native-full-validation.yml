@@ -1,4 +1,4 @@
-name: Windows differential diagnosis of 14 unmatched failures
+name: Windows native popup capture evidence
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario: [baseline, features, upstream]
+        scenario: [upstream]
     env:
       ORCA_BACKGROUND_LAUNCH: '1'
       ORCA_PNPM_GLOBAL_VIRTUAL_STORE: '0'
@@ -32,7 +32,7 @@ jobs:
         run: Copy-Item .github/diagnostics "$env:RUNNER_TEMP/differential-tools" -Recurse
       - uses: actions/checkout@v6
         with:
-          ref: ${{ matrix.scenario == 'baseline' && 'a6c78e3de39793513a94508564673efb14c4782f' || matrix.scenario == 'upstream' && '0e5d2cb5ea754e44bbaab181ce6873bf3d9eaeea' || github.sha }}
+          ref: cd51358d0a45e3d9a258abebb2625037660ca50c
           fetch-depth: 1
           filter: blob:none
           persist-credentials: false
@@ -78,12 +78,13 @@ jobs:
           node config/scripts/native-build/windows/build-windows-cli-launcher.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Diagnose exact paired failures without changing assertions
+      - name: Capture paired hidden native popup viewports
         shell: pwsh
         env:
           VALIDATION_SCENARIO: ${{ matrix.scenario }}
           ORCA_DIAG_REMAINING_TWO: '1'
           ORCA_DIAG_APPLY_POPUP_FIX: '1'
+          ORCA_DIAG_CAPTURE_ONLY: '1'
         run: node "$env:RUNNER_TEMP/differential-tools/run.cjs"
 
       - name: Upload paired diagnosis
