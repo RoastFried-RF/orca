@@ -1,0 +1,81 @@
+name: Windows differential diagnosis of 14 unmatched failures
+
+on:
+  push:
+    branches:
+      - validation/windows-differential-14
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: ${{ matrix.scenario }} differential diagnosis
+    runs-on: windows-2025
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [baseline, features]
+    env:
+      ORCA_BACKGROUND_LAUNCH: '1'
+      ORCA_PNPM_GLOBAL_VIRTUAL_STORE: '0'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Preserve diagnostic tooling across paired source checkout
+        shell: pwsh
+        run: Copy-Item .github/diagnostics "$env:RUNNER_TEMP/differential-tools" -Recurse
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.scenario == 'baseline' && 'a6c78e3de39793513a94508564673efb14c4782f' || github.sha }}
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - uses: ./.github/actions/install-node-dependencies
+        with:
+          native-runtime: node
+          node-version: '24.22.1'
+          cache-electron-package: 'true'
+
+      - name: Install Electron package binary
+        run: node config/scripts/electron-installation/platform-layout/install-electron-package-binary.mjs
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: config/.bun-version
+          no-cache: true
+
+      # Tests replace HOME; keep rustup and Cargo anchored to the disposable runner.
+      - name: Prepare Windows Rust executables before isolated test homes
+        shell: pwsh
+        run: |
+          $env:RUSTUP_HOME = Join-Path $env:USERPROFILE '.rustup'
+          $env:CARGO_HOME = Join-Path $env:USERPROFILE '.cargo'
+          $env:RUSTUP_TOOLCHAIN = 'stable'
+          "RUSTUP_HOME=$env:RUSTUP_HOME" >> $env:GITHUB_ENV
+          "CARGO_HOME=$env:CARGO_HOME" >> $env:GITHUB_ENV
+          "RUSTUP_TOOLCHAIN=$env:RUSTUP_TOOLCHAIN" >> $env:GITHUB_ENV
+          cargo --version
+          if ($LASTEXITCODE -ne 0) { throw 'The runner Rust toolchain is unavailable' }
+          node config/scripts/native-build/windows/build-windows-agent-hook.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node config/scripts/native-build/windows/build-windows-cli-launcher.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Diagnose exact paired failures without changing assertions
+        shell: pwsh
+        env:
+          VALIDATION_SCENARIO: ${{ matrix.scenario }}
+        run: node "$env:RUNNER_TEMP/differential-tools/run.cjs"
+
+      - name: Upload paired diagnosis
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: differential-${{ matrix.scenario }}-attempt-${{ github.run_attempt }}
+          path: ci-shards/differential/
+          if-no-files-found: warn
+          retention-days: 7

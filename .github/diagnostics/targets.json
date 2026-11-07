@@ -1,0 +1,85 @@
+[
+  {
+    "id": 1,
+    "file": "src/main/wsl/host-lifecycle/wsl-host-service.test.ts",
+    "name": "WslHostService treats a distro being added as known, so its first connect may spawn",
+    "title": "treats a distro being added as known, so its first connect may spawn"
+  },
+  {
+    "id": 2,
+    "file": "src/main/runtime/orca-runtime.test.ts",
+    "name": "OrcaRuntimeService clones past a saved SSH project that shares the clone path",
+    "title": "clones past a saved SSH project that shares the clone path"
+  },
+  {
+    "id": 3,
+    "file": "src/main/ipc/runtime-environments/runtime-environment-preference.test.ts",
+    "name": "Active Server after a saved host is removed does not select a same-name replacement or another saved server",
+    "title": "does not select a same-name replacement or another saved server"
+  },
+  {
+    "id": 4,
+    "file": "src/main/acp/acp-timeline-opencode-dialect.test.ts",
+    "name": "OpenCode over ACP keeps non-reset errors generic: Your current subscription plan does not…",
+    "title": "keeps non-reset errors generic: Your current subscription plan does not…"
+  },
+  {
+    "id": 5,
+    "file": "src/shared/remote-runtime/host-store/runtime-environment-sidecar.test.ts",
+    "name": "runtime environment sidecar across a downgrade refuses ordinary removal while linked, and drops the entry when an unlinked server is removed",
+    "title": "refuses ordinary removal while linked, and drops the entry when an unlinked server is removed"
+  },
+  {
+    "id": 6,
+    "file": "src/shared/remote-runtime/host-store/wsl-host-deployment-store.test.ts",
+    "name": "WSL host deployment store downgrade to builds that never read the WSL file keeps SSH servers managed under main's reader, which sees the WSL server as a plain pairing",
+    "title": "keeps SSH servers managed under main's reader, which sees the WSL server as a plain pairing"
+  },
+  {
+    "id": 7,
+    "file": "src/main/hermes/hook-service.test.ts",
+    "name": "HermesHookService registered plugin hooks post normalized JSON to Orca",
+    "title": "registered plugin hooks post normalized JSON to Orca"
+  },
+  {
+    "id": 8,
+    "file": "src/main/persistence/moving-wsl-projects/wsl-move-scope-guard.test.ts",
+    "name": "WSL move edit guard only fences a repo row that runs on this machine",
+    "title": "only fences a repo row that runs on this machine"
+  },
+  {
+    "id": 9,
+    "file": "src/main/browser/guest-lifecycle/popups/browser-popup-background-compatibility.electron.test.ts",
+    "name": "<suite setup/import>"
+  },
+  {
+    "id": 10,
+    "file": "src/shared/remote-runtime/host-store/runtime-environment-store-unreadable-records.test.ts",
+    "name": "runtime environment store with records this build cannot read an unreadable sidecar entry is never replaced, pruned, or orphaned by writes",
+    "title": "is never replaced, pruned, or orphaned by writes"
+  },
+  {
+    "id": 11,
+    "file": "src/shared/remote-runtime/host-store/runtime-environment-wsl-host-store.test.ts",
+    "name": "WSL host environment store keeps two distros that carry the same orcad key as two hosts",
+    "title": "keeps two distros that carry the same orcad key as two hosts"
+  },
+  {
+    "id": 12,
+    "file": "src/cli/runtime/environments.test.ts",
+    "name": "CLI runtime environments saves, resolves, and removes a paired environment",
+    "title": "saves, resolves, and removes a paired environment"
+  },
+  {
+    "id": 13,
+    "file": "src/main/artifacts/artifact-recovery-directory-fsync.test.ts",
+    "name": "keeps durable artifact records usable when directory fsync is unsupported",
+    "title": "keeps durable artifact records usable when directory fsync is unsupported"
+  },
+  {
+    "id": 14,
+    "file": "src/main/runtime/mobile-desktop-relay/mobile-desktop-relay.integration.test.ts",
+    "name": "mobile desktop relay: phone -> desktop -> server admits a proven phone locator on the configured delegated target, never the relay owner",
+    "title": "admits a proven phone locator on the configured delegated target, never the relay owner"
+  }
+]
