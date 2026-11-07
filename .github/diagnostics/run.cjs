@@ -4,6 +4,7 @@ const fs = require('node:fs'),
 const { spawnSync } = require('node:child_process')
 const targets = require('./targets.json')
 const remainingTwo = process.env.ORCA_DIAG_REMAINING_TWO === '1'
+const applyFix = process.env.ORCA_DIAG_APPLY_POPUP_FIX === '1'
 const output = path.resolve('ci-shards/differential')
 fs.mkdirSync(output, { recursive: true })
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
@@ -15,6 +16,30 @@ fs.writeFileSync(
     2
   )
 )
+if (applyFix) {
+  const applied = spawnSync('git', ['apply', path.join(__dirname, 'popup-fixture-fix.patch')], {
+    encoding: 'utf8'
+  })
+  if (applied.status !== 0) {
+    throw new Error(applied.stderr)
+  }
+  const file =
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts'
+  fs.writeFileSync(
+    path.join(output, 'repair.json'),
+    JSON.stringify(
+      {
+        file,
+        sha256: require('node:crypto')
+          .createHash('sha256')
+          .update(fs.readFileSync(file))
+          .digest('hex')
+      },
+      null,
+      2
+    )
+  )
+}
 if (remainingTwo) {
   const started = Date.now()
   const python = spawnSync(
@@ -43,8 +68,12 @@ if (remainingTwo) {
     throw new Error('Python stdlib probe failed; Hermes must not silently return')
   }
 }
+const originalFiles = new Map()
 const edit = (file, before, after) => {
   const source = fs.readFileSync(file, 'utf8')
+  if (!originalFiles.has(file)) {
+    originalFiles.set(file, source)
+  }
   if (!source.includes(before)) {
     throw new Error(`Diagnostic anchor missing: ${file}`)
   }
@@ -138,7 +167,7 @@ const pattern = targets
   .join('|')
 const files = targets.map((t) => t.file)
 const runs = []
-function run(label, args) {
+function run(label, args, command = 'test') {
   const logfile = path.join(output, `${label}.log`),
     fd = fs.openSync(logfile, 'w')
   const env = {
@@ -147,14 +176,18 @@ function run(label, args) {
     ...(remainingTwo ? { ORCA_DIAG_POPUP_STATUS_DIR: path.join(output, `${label}-electron`) } : {})
   }
   const argv = [
-    'test',
+    command,
     ...args,
-    '--maxWorkers=1',
-    '--no-file-parallelism',
-    '--reporter=default',
-    '--reporter=json',
-    `--reporter=${path.join(__dirname, 'reporter.mjs')}`,
-    `--outputFile.json=${path.join(output, `${label}-results.json`)}`
+    ...(command === 'test'
+      ? [
+          '--maxWorkers=1',
+          '--no-file-parallelism',
+          '--reporter=default',
+          '--reporter=json',
+          `--reporter=${path.join(__dirname, 'reporter.mjs')}`,
+          `--outputFile.json=${path.join(output, `${label}-results.json`)}`
+        ]
+      : [])
   ]
   console.log(`Starting ${label}`)
   const started = Date.now()
@@ -201,6 +234,17 @@ if (remainingTwo) {
     'clone|clones|cloning|submodule cache'
   ])
 }
+if (applyFix) {
+  run('related-popups', [
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility.electron.test.ts',
+    'src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts',
+    'src/main/browser/guest-lifecycle/popups/browser-popup-adapter-compatibility.electron.test.ts'
+  ])
+  for (const [file, source] of originalFiles) {
+    fs.writeFileSync(file, source)
+  }
+  run('changed-check', ['--base=HEAD', '--maxWorkers=2', '--timeout=10'], 'check:changed')
+}
 const summaries = []
 for (const run of runs) {
   const filename = path.join(output, `${run.label}-results.json`)
@@ -237,3 +281,6 @@ console.log(
     }))
   )
 )
+if (applyFix && runs.some((run) => run.exit !== 0)) {
+  process.exitCode = 1
+}
