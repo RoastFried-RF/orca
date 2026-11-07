@@ -36,6 +36,14 @@ if (applyFix) {
         sha256: require('node:crypto')
           .createHash('sha256')
           .update(fs.readFileSync(file))
+          .digest('hex'),
+        sizingSha256: require('node:crypto')
+          .createHash('sha256')
+          .update(
+            fs.readFileSync(
+              'src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts'
+            )
+          )
           .digest('hex')
       },
       null,
