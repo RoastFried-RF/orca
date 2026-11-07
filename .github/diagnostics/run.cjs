@@ -6,6 +6,7 @@ const targets = require('./targets.json')
 const remainingTwo = process.env.ORCA_DIAG_REMAINING_TWO === '1'
 const applyFix = process.env.ORCA_DIAG_APPLY_POPUP_FIX === '1'
 const captureOnly = process.env.ORCA_DIAG_CAPTURE_ONLY === '1'
+const nativeCapture = process.env.ORCA_DIAG_NATIVE_CAPTURE === '1'
 const output = path.resolve('ci-shards/differential')
 fs.mkdirSync(output, { recursive: true })
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
@@ -265,7 +266,7 @@ if (applyFix && !captureOnly) {
   }
   run('changed-check', ['--base=HEAD', '--maxWorkers=2', '--timeout=10'], 'check:changed')
 }
-if (captureOnly) {
+if (captureOnly && !nativeCapture) {
   for (const [file, source] of originalFiles) {
     fs.writeFileSync(file, source)
   }
@@ -285,10 +286,30 @@ if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
     [testFile, productFile, fixtureFile].map((file) => [file, fs.readFileSync(file, 'utf8')])
   )
   try {
+    let fixtureSource = sources.get(fixtureFile)
+    if (nativeCapture) {
+      fixtureSource = `import { mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+${fixtureSource.replace(
+  'this.windows.push(window)',
+  `window.on('show', () => this.presentationCalls.push('native-show-event'))
+      window.on('focus', () => this.presentationCalls.push('native-focus-event'))
+      window.webContents.on('console-message', ({ message }) => {
+        if (message !== 'orca-popup-fixture:capture-native') return
+        const directory = process.env.ORCA_DIAG_POPUP_STATUS_DIR
+        if (!directory) return
+        void window.webContents.capturePage(undefined, { stayHidden: false, stayAwake: true }).then(image => {
+          mkdirSync(directory, { recursive: true })
+          writeFileSync(join(directory, 'minimum-native.png'), image.toPNG())
+          writeFileSync(join(directory, 'native-capture-state.json'), JSON.stringify({visible: window.isVisible(), focused: window.isFocused(), type: window.webContents.getType(), presentationCalls: this.presentationCalls, size: image.getSize()}, null, 2))
+        }).catch(error => writeFileSync(join(directory, 'native-capture-error.txt'), String(error)))
+      })
+      this.windows.push(window)`
+)}`
+    }
     fs.writeFileSync(
       fixtureFile,
-      sources
-        .get(fixtureFile)
+      fixtureSource
         .replace(
           'this.windows.push(window)',
           'window.webContents.setBackgroundThrottling(false)\n      this.windows.push(window)'
@@ -309,7 +330,7 @@ if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
         .get(testFile)
         .replace(
           "import { mkdirSync } from 'node:fs'",
-          "import { mkdirSync, writeFileSync } from 'node:fs'"
+          "import { existsSync, mkdirSync, writeFileSync } from 'node:fs'"
         )
         .replace(
           "await child.evaluate('window.resizeTo(100, 100)')",
@@ -318,6 +339,13 @@ if (applyFix && process.env.VALIDATION_SCENARIO === 'upstream') {
       const evidenceDir = process.env.ORCA_DIAG_POPUP_STATUS_DIR!
       mkdirSync(evidenceDir, { recursive: true })
       writeFileSync(join(evidenceDir, 'minimum.json'), JSON.stringify({native: status().native.windows.at(-1), windowsHidden: status().windowsHidden, presentationCalls: status().native.presentationCalls, rendererBackgroundThrottling: false, page: await child.evaluate(() => ({innerWidth, innerHeight, outerWidth, outerHeight, devicePixelRatio}))}, null, 2))
+      if (process.env.ORCA_DIAG_NATIVE_CAPTURE === '1') {
+        await child.evaluate("console.log('orca-popup-fixture:capture-native')")
+        const deadline = Date.now() + 5000
+        while (!existsSync(join(evidenceDir, 'minimum-native.png')) && Date.now() < deadline) {
+          await new Promise(resolve => setTimeout(resolve, 25))
+        }
+      }
       try {
         await child.screenshot({path: join(evidenceDir, 'minimum.png'), timeout: 5000, animations: 'disabled'})
       } catch (error) {

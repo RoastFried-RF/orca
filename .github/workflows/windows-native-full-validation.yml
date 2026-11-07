@@ -85,6 +85,7 @@ jobs:
           ORCA_DIAG_REMAINING_TWO: '1'
           ORCA_DIAG_APPLY_POPUP_FIX: '1'
           ORCA_DIAG_CAPTURE_ONLY: '1'
+          ORCA_DIAG_NATIVE_CAPTURE: '1'
         run: node "$env:RUNNER_TEMP/differential-tools/run.cjs"
 
       - name: Upload paired diagnosis
