@@ -17,8 +17,10 @@ fs.writeFileSync(
   )
 )
 if (applyFix) {
-  const applied = spawnSync('git', ['apply', path.join(__dirname, 'popup-fixture-fix.patch')], {
-    encoding: 'utf8'
+  const patch = fs.readFileSync(path.join(__dirname, 'popup-fixture-fix.patch'), 'utf8')
+  const applied = spawnSync('git', ['apply', '-'], {
+    encoding: 'utf8',
+    input: patch.replace(/\r\n/g, '\n')
   })
   if (applied.status !== 0) {
     throw new Error(applied.stderr)
@@ -30,6 +32,7 @@ if (applyFix) {
     JSON.stringify(
       {
         file,
+        patchCrlfLines: patch.split('\r\n').length - 1,
         sha256: require('node:crypto')
           .createHash('sha256')
           .update(fs.readFileSync(file))
