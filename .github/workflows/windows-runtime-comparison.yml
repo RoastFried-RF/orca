@@ -1,0 +1,85 @@
+name: Windows runtime untruncated comparison
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [validation/windows-differential-14]
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    name: ${{ matrix.scenario }} complete runtime evidence
+    runs-on: windows-2025
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scenario: baseline
+            revision: a6c78e3de39793513a94508564673efb14c4782f
+          - scenario: features
+            revision: 9efde148f23cec304d3f39a4694a31871d4770cd
+          - scenario: upstream
+            revision: 0e5d2cb5ea754e44bbaab181ce6873bf3d9eaeea
+    env:
+      ORCA_BACKGROUND_LAUNCH: '1'
+      ORCA_PNPM_GLOBAL_VIRTUAL_STORE: '0'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Preserve diagnostic tools
+        shell: pwsh
+        run: Copy-Item .github/diagnostics "$env:RUNNER_TEMP/runtime-tools" -Recurse
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.revision }}
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+      - name: Fetch selected commit history only
+        shell: pwsh
+        run: |
+          $revision = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ((git rev-parse --is-shallow-repository).Trim() -eq 'true') {
+            git -c protocol.version=2 fetch --no-tags --filter=blob:none --unshallow origin $revision
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - uses: ./.github/actions/install-node-dependencies
+        with:
+          native-runtime: node
+          node-version: '24.22.1'
+          cache-electron-package: 'true'
+      - name: Install isolated Electron binary
+        run: node config/scripts/electron-installation/platform-layout/install-electron-package-binary.mjs
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: config/.bun-version
+          no-cache: true
+      - name: Prepare Windows native prerequisites
+        shell: pwsh
+        run: |
+          "RUSTUP_HOME=$(Join-Path $env:USERPROFILE '.rustup')" >> $env:GITHUB_ENV
+          "CARGO_HOME=$(Join-Path $env:USERPROFILE '.cargo')" >> $env:GITHUB_ENV
+          "RUSTUP_TOOLCHAIN=stable" >> $env:GITHUB_ENV
+          node config/scripts/native-build/windows/build-windows-agent-hook.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node config/scripts/native-build/windows/build-windows-cli-launcher.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run exact related selection with complete file streams
+        shell: pwsh
+        env:
+          VALIDATION_SCENARIO: ${{ matrix.scenario }}
+        run: node "$env:RUNNER_TEMP/runtime-tools/runtime-comparison.cjs"
+      - name: Upload complete streams and structured results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: runtime-${{ matrix.scenario }}-attempt-${{ github.run_attempt }}
+          path: ci-shards/runtime-comparison/
+          if-no-files-found: warn
+          retention-days: 7

@@ -2,10 +2,6 @@ name: Windows native popup capture evidence
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - validation/windows-differential-14
-      - validation/windows-native-fixed-unit-suite
 
 permissions:
   contents: read

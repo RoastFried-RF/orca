@@ -1,0 +1,121 @@
+diff --git a/src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts b/src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts
+index 6dc3ab32..0888a075 100644
+--- a/src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts
++++ b/src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts
+@@ -7,7 +7,8 @@ import {
+   type Session,
+   type WebContents
+ } from 'electron'
+-import { renameSync, writeFileSync } from 'node:fs'
++import { writeFileSync } from 'node:fs'
++import { renameFileWithWindowsRetry } from '../../../../shared/windows-retry-file-operations'
+ import { applyBackgroundActivationPolicy } from '../../../window/foreground-activation-policy'
+ import { BrowserPopupCompatibilityManager } from './browser-popup-compatibility-manager-fixture'
+ import { BrowserRouteWebContentsRegistry } from '../../routing/guest-authority/browser-route-webcontents-registry'
+@@ -48,6 +49,7 @@ const authority = Symbol('fixture-route-authority')
+ let fixtureAuthority: symbol | null = authority
+ let fixtureAuthorityThrows = false
+ let revision = 0
++let failure: string | undefined
+ const adapterProbe =
+   process.env.ORCA_POPUP_FIXTURE_ADAPTER_PROBE === '1'
+     ? new BrowserPopupAdapterProbeFixture(() => writeStatus())
+@@ -65,14 +67,16 @@ const native = new BrowserPopupNativeFixture({
+   writeStatus
+ })
+ 
++/** Keeps the first failure visible while guest teardown publishes final snapshots. */
+ function writeStatus(error?: string): void {
++  failure ??= error
+   writeFileSync(
+     `${fixtureStatusPath}.next`,
+     JSON.stringify({
+       revision: ++revision,
+       ready,
+       phase,
+-      error,
++      error: failure,
+       tabOpens: manager.tabOpens,
+       childRequests: manager.childRequests,
+       native: native.snapshot(),
+@@ -92,9 +96,10 @@ function writeStatus(error?: string): void {
+       guestIds: Object.fromEntries([...guests].map(([name, guest]) => [name, guest.id]))
+     })
+   )
+-  renameSync(`${fixtureStatusPath}.next`, fixtureStatusPath)
++  renameFileWithWindowsRetry(`${fixtureStatusPath}.next`, fixtureStatusPath)
+ }
+ 
++/** Resolves after the hidden host's partitioned guest is configured and its initial page loads. */
+ async function createHost(name: string, partition: string, nativeControl = false): Promise<void> {
+   const host = new BrowserWindow({
+     show: false,
+@@ -178,7 +183,7 @@ async function createHost(name: string, partition: string, nativeControl = false
+           })
+         }
+         await guest.loadURL(`${fixtureOrigin}/${name}`)
+-        guest.once('destroyed', writeStatus)
++        guest.once('destroyed', () => writeStatus())
+         resolve()
+       })().catch(reject)
+     })
+diff --git a/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts b/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
+index 2c86126b..64f1e534 100644
+--- a/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
++++ b/src/main/browser/guest-lifecycle/popups/browser-popup-native-compatibility.electron.test.ts
+@@ -15,7 +15,6 @@ import {
+   setPopupFixtureEvidenceName
+ } from './browser-popup-compatibility-cdp-fixture'
+ import { waitForHiddenFrameInput } from '../../electron-fixtures/hidden-frame-input-readiness-fixture'
+-import { MIN_POPUP_CONTENT_HEIGHT, MIN_POPUP_CONTENT_WIDTH } from './popup-window-minimum-size'
+ 
+ setPopupFixtureEvidenceName('native-electron-evidence.json')
+ 
+@@ -502,13 +501,12 @@ describe('hidden Chromium native popup request compatibility', () => {
+         await page.locator('#scripted-native').click({ modifiers: ['Shift'] })
+       }
+       const child = await childPage(`${origin}${path}`)
+-      // Native size conversion can round by one pixel; the resize must still take effect.
++      // resizeTo sizes the outer window; native frames are excluded from contentSize.
+       await child.evaluate('window.resizeTo(640, 480)')
+       await expect
+         .poll(async () => {
+-          await refreshStatus()
+-          const width = status().native.windows.at(-1)?.contentSize[0]
+-          return Math.abs((width ?? Infinity) - 640)
++          const width = await child.evaluate(() => window.outerWidth)
++          return Math.abs(width - 640)
+         })
+         .toBeLessThanOrEqual(1)
+       await child.evaluate('window.resizeTo(100, 100)')
+@@ -517,7 +515,7 @@ describe('hidden Chromium native popup request compatibility', () => {
+           await refreshStatus()
+           return status().native.windows.at(-1)?.contentSize
+         })
+-        .toEqual([MIN_POPUP_CONTENT_WIDTH, MIN_POPUP_CONTENT_HEIGHT])
++        .toEqual([360, 200])
+       await closeChildren(page)
+       await page.locator('#shift').evaluate((link) => link.setAttribute('href', '/shift'))
+     }
+diff --git a/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts b/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
+index c4d6e1fd..8af6a197 100644
+--- a/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
++++ b/src/main/browser/guest-lifecycle/popups/browser-popup-native-window.ts
+@@ -28,7 +28,7 @@ export function isNativeBrowserPopupRequest(input: {
+   )
+ }
+ 
+-// OpenURL creates synchronously; scripted window.open creates its child in a later task.
++/** Preserves pre-navigation admission across synchronous links and deferred script windows. */
+ export function allowNativeBrowserPopup(input: {
+   opener: WebContents
+   options: Electron.BrowserWindowConstructorOptions
+@@ -97,6 +97,8 @@ export function allowNativeBrowserPopup(input: {
+       ...input.options,
+       title: 'about:blank',
+       fullscreenable: false,
++      // Match origin-bar popups: a visible app menu consumes the minimum content height.
++      autoHideMenuBar: true,
+       show: mayPresent && !input.background,
+       // Content-sized like origin-bar popups, so resizeTo cannot hide the origin title.
+       useContentSize: true,
