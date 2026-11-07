@@ -77,6 +77,41 @@ if (remainingTwo) {
     '(error) => {\n            if (!error)',
     '(error, stdout, stderr) => {\n            console.error("DIAG_HERMES_CHILD_EXIT", JSON.stringify({ at: Date.now(), error: error && String(error), stdout, stderr }))\n            if (!error)'
   )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-cdp-fixture.ts',
+    'stderr += data.toString()',
+    "stderr += data.toString()\n    console.error('DIAG_ELECTRON_STDERR', data.toString())"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-cdp-fixture.ts',
+    "fixture.stderr?.on('data',",
+    "fixture.once('exit', (code, signal) => console.error('DIAG_ELECTRON_EXIT', JSON.stringify({ code, signal, stderr })))\n  fixture.stderr?.on('data',"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
+    "process.on('uncaughtException', (error) => {",
+    "process.on('uncaughtException', (error) => {\n  console.error('DIAG_UNCAUGHT', error)"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
+    "process.on('unhandledRejection', (error) => {",
+    "process.on('unhandledRejection', (error) => {\n  console.error('DIAG_REJECTION', error)"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
+    'function writeStatus(error?: string): void {',
+    "function writeStatus(error?: string): void {\n  if (error !== undefined) console.error('DIAG_STATUS_ARGUMENT', error)"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
+    'async function run(): Promise<void> {',
+    "async function run(): Promise<void> {\n  app.on('web-contents-created', (_event, contents) => {\n    const id = contents.id\n    contents.on('did-fail-load', (_event, code, description, url) => console.error('DIAG_LOAD_FAILED', JSON.stringify({ id, code, description, url })))\n    contents.on('render-process-gone', (_event, details) => console.error('DIAG_RENDERER_GONE', JSON.stringify({ id, details })))\n  })"
+  )
+  edit(
+    'src/main/browser/guest-lifecycle/popups/browser-popup-background-cdp-probe.ts',
+    'const page = guest(control ? `${name}-control` : name)',
+    "console.error('DIAG_PROBE', JSON.stringify({ name, probe, control }))\n  const page = guest(control ? `${name}-control` : name)"
+  )
 }
 edit(
   'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
@@ -153,7 +188,7 @@ if (remainingTwo) {
   for (let round = 1; round <= 3; round++) {
     run(
       `remaining-two-${round}`,
-      targets.filter((t) => t.id === 7 || t.id === 9).map((t) => t.file)
+      targets.filter((t) => t.id === 9).map((t) => t.file)
     )
   }
 } else {
