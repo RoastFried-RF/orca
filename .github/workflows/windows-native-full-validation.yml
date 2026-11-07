@@ -25,6 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          fetch-depth: 1
           persist-credentials: false
       - name: Preserve diagnostic tooling across paired source checkout
         shell: pwsh
@@ -32,9 +33,19 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ matrix.scenario == 'baseline' && 'a6c78e3de39793513a94508564673efb14c4782f' || github.sha }}
-          fetch-depth: 0
+          fetch-depth: 1
           filter: blob:none
           persist-credentials: false
+
+      - name: Fetch complete history for the selected commit only
+        shell: pwsh
+        run: |
+          $revision = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ((git rev-parse --is-shallow-repository).Trim() -eq 'true') {
+            git -c protocol.version=2 fetch --no-tags --filter=blob:none --unshallow origin $revision
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
 
       - uses: ./.github/actions/install-node-dependencies
         with:
