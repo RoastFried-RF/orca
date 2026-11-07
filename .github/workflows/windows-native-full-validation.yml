@@ -82,6 +82,7 @@ jobs:
         shell: pwsh
         env:
           VALIDATION_SCENARIO: ${{ matrix.scenario }}
+          ORCA_DIAG_REMAINING_TWO: '1'
         run: node "$env:RUNNER_TEMP/differential-tools/run.cjs"
 
       - name: Upload paired diagnosis

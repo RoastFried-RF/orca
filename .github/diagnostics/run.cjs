@@ -3,6 +3,7 @@ const fs = require('node:fs'),
   util = require('node:util')
 const { spawnSync } = require('node:child_process')
 const targets = require('./targets.json')
+const remainingTwo = process.env.ORCA_DIAG_REMAINING_TWO === '1'
 const output = path.resolve('ci-shards/differential')
 fs.mkdirSync(output, { recursive: true })
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
@@ -14,6 +15,34 @@ fs.writeFileSync(
     2
   )
 )
+if (remainingTwo) {
+  const started = Date.now()
+  const python = spawnSync(
+    'python3',
+    [
+      '-c',
+      'import sys, json, encodings, urllib.request, http.server, ssl; print(json.dumps({"executable":sys.executable,"version":sys.version}))'
+    ],
+    { encoding: 'utf8', timeout: 30000 }
+  )
+  fs.writeFileSync(
+    path.join(output, 'python.json'),
+    JSON.stringify(
+      {
+        status: python.status,
+        stdout: python.stdout,
+        stderr: python.stderr,
+        durationMs: Date.now() - started,
+        error: python.error && util.inspect(python.error)
+      },
+      null,
+      2
+    )
+  )
+  if (python.status !== 0) {
+    throw new Error('Python stdlib probe failed; Hermes must not silently return')
+  }
+}
 const edit = (file, before, after) => {
   const source = fs.readFileSync(file, 'utf8')
   if (!source.includes(before)) {
@@ -32,6 +61,23 @@ edit(
   "new Error('timed out waiting for Hermes plugin POST')",
   "new Error('timed out waiting for Hermes plugin POST; child/startup/import/POST share the existing 5000ms budget')"
 )
+if (remainingTwo) {
+  edit(
+    'src/main/hermes/hook-service.test.ts',
+    "'import importlib.util',",
+    "'import importlib.util, sys, time',\n          'print(\"DIAG_HERMES_PYTHON_START\", time.monotonic(), file=sys.stderr, flush=True)',"
+  )
+  edit(
+    'src/main/hermes/hook-service.test.ts',
+    "'spec.loader.exec_module(mod)',",
+    "'spec.loader.exec_module(mod)',\n          'print(\"DIAG_HERMES_PLUGIN_IMPORTED\", time.monotonic(), file=sys.stderr, flush=True)',"
+  )
+  edit(
+    'src/main/hermes/hook-service.test.ts',
+    '(error) => {\n            if (!error)',
+    '(error, stdout, stderr) => {\n            console.error("DIAG_HERMES_CHILD_EXIT", JSON.stringify({ at: Date.now(), error: error && String(error), stdout, stderr }))\n            if (!error)'
+  )
+}
 edit(
   'src/main/browser/guest-lifecycle/popups/browser-popup-compatibility-electron-fixture.ts',
   'writeStatus(String(error))\n  app.exit(1)\n})',
@@ -55,7 +101,10 @@ function run(label, args) {
     fd = fs.openSync(logfile, 'w')
   const env = {
     ...process.env,
-    ORCA_DIFFERENTIAL_EVENTS: path.join(output, `${label}-events.jsonl`)
+    ORCA_DIFFERENTIAL_EVENTS: path.join(output, `${label}-events.jsonl`),
+    ...(remainingTwo
+      ? { ORCA_POPUP_FIXTURE_ARTIFACT_DIR: path.join(output, `${label}-electron`) }
+      : {})
   }
   const argv = [
     'test',
@@ -95,14 +144,23 @@ function run(label, args) {
   console.log(`Finished ${label}: ${child.status}, ${Date.now() - started}ms`)
 }
 // Run exact cases twice, then preserve clone predecessor ordering in a separate invocation.
-for (let round = 1; round <= 2; round++) {
-  run(`selected-${round}`, [...files, '-t', pattern])
+if (remainingTwo) {
+  for (let round = 1; round <= 3; round++) {
+    run(
+      `remaining-two-${round}`,
+      targets.filter((t) => t.id === 7 || t.id === 9).map((t) => t.file)
+    )
+  }
+} else {
+  for (let round = 1; round <= 2; round++) {
+    run(`selected-${round}`, [...files, '-t', pattern])
+  }
+  run('clone-predecessors', [
+    'src/main/runtime/orca-runtime.test.ts',
+    '-t',
+    'clone|clones|cloning|submodule cache'
+  ])
 }
-run('clone-predecessors', [
-  'src/main/runtime/orca-runtime.test.ts',
-  '-t',
-  'clone|clones|cloning|submodule cache'
-])
 const summaries = []
 for (const run of runs) {
   const filename = path.join(output, `${run.label}-results.json`)
